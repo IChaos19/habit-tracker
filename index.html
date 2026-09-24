@@ -857,13 +857,13 @@
         const SUPABASE_URL = 'https://kpvifxpxatosmaumldry.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwdmlmeHB4YXRvc21hdW1sZHJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0NDcyODEsImV4cCI6MjEwNTAyMzI4MX0.LCrNpv1dR10KRO7WBh-nfhkdp-nO0cYaAUeiKXpjTWQ';
 
-        let supabase = null;
+        let sbClient = null;
 
         function initSupabase() {
-            if (window.supabase && !supabase) {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            if (window.supabase && !sbClient) {
+                sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             }
-            return supabase;
+            return sbClient;
         }
 
         // ========== STATE ==========
