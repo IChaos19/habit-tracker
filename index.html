@@ -1181,6 +1181,13 @@
 
         function updatePointsPreview() {
             const customTime = parseInt(document.getElementById('customTime').value);
+
+            // If custom time is entered, deselect preset buttons
+            if (customTime && !isNaN(customTime)) {
+                selectedTime = null;
+                document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+            }
+
             const minutes = customTime || selectedTime;
             const preview = document.getElementById('pointsPreview');
 
