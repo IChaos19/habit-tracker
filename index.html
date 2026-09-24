@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker v3.0.3</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        /* AUTH SCREENS */
+        .auth-container {
+            padding: 60px 40px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .auth-container h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .auth-container p {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 12px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 8px 4px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        .btn-secondary:hover {
+            background: #e8e8e8;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            display: none;
+        }
+
+        /* MAIN APP */
+        .app-container {
+            display: none;
+            height: 100vh;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 40px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-info .name {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .user-info .email {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .btn-logout {
+            background: #fee;
+            color: #c33;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: #fdd;
+        }
+
+        .content {
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* PROGRESS TRACK (Vertical) */
+        .progress-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .progress-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .vertical-track {
+            width: 80px;
+            height: 400px;
+            background: linear-gradient(180deg, #e0e0e0 0%, #f0f0f0 100%);
+            border-radius: 40px;
+            border: 3px solid #ddd;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-fill {
+            width: 100%;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            border-radius: 40px;
+            transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .character {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            position: absolute;
+            left: 10px;
+            animation: bounce 0.6s ease;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        @keyframes bounce {
+            0% { transform: scale(0.8); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .milestones {
+            position: absolute;
+            left: -45px;
+            top: 0;
+            bottom: 0;
+            width: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #999;
+        }
+
+        .milestone {
+            text-align: right;
+        }
+
+        .progress-stats {
+            font-size: 12px;
+            color: #666;
+            margin-top: 20px;
+        }
+
+        .progress-stats .stat {
+            margin: 8px 0;
+        }
+
+        .stat-label {
+            color: #999;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* ADD HABIT FORM */
+        .add-habit-form {
+            display: flex;
+            gap: 12px;
+        }
+
+        .add-habit-form input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .add-habit-form input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-add {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        /* HABITS LIST */
+        .habits-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .habit-item {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .habit-item:hover {
+            background: #f0f1f3;
+            transform: translateX(4px);
+        }
+
+        .habit-info {
+            flex: 1;
+        }
+
+        .habit-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .habit-stats {
+            font-size: 12px;
+            color: #999;
+            display: flex;
+            gap: 16px;
+        }
+
+        .habit-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-log {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .btn-log:hover {
+            background: #c8e6c9;
+        }
+
+        .btn-complete {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .btn-complete:hover {
+            background: #ffe0b2;
+        }
+
+        .btn-delete {
+            background: #fee;
+            color: #c33;
+        }
+
+        .btn-delete:hover {
+            background: #fdd;
+        }
+
+        /* MODALS */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-content h2 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .modal-stat {
+            margin: 16px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .modal-stat .value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #667eea;
+            display: block;
+        }
+
+        .modal-actions {
+            margin-top: 24px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .modal-close:hover {
+            background: #e0e0e0;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            margin: 16px 0;
+            text-align: center;
+        }
+
+        .time-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .time-btn {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .time-btn:hover {
+            border-color: #667eea;
+            background: #f5f7ff;
+        }
+
+        .time-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* TOAST NOTIFICATION */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            animation: slideInRight 0.3s ease;
+            z-index: 2000;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .toast.success {
+            background: #2e7d32;
+        }
+
+        .toast.error {
+            background: #c33;
+        }
+
+        .toast.warning {
+            background: #f57c00;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .progress-section {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .auth-container {
+                padding: 40px 24px;
+            }
+
+            .header {
+                padding: 16px 20px;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .modal-content {
+                margin: 20px;
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- AUTH SCREENS -->
+    <div id="authScreen" class="container">
+        <div class="auth-container">
+            <h1>🎯 Habit Tracker</h1>
+            <p>Build better habits, one day at a time</p>
+
+            <div id="errorMessage" class="error-message"></div>
+
+            <div id="loginForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••">
+                </div>
+                <button class="btn btn-primary" id="signInBtn" onclick="login()">Sign In</button>
+                <button class="btn btn-secondary" id="createAcctBtn" onclick="showRegister()">Create Account</button>
+                <button class="btn btn-secondary" id="guestBtn" onclick="guestMode()">Continue as Guest</button>
+            </div>
+
+            <div id="registerForm" style="display: none;">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="registerEmail" placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Display Name</label>
+                    <input type="text" id="registerName" placeholder="Your Name">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="registerPassword" placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="registerConfirm" placeholder="••••••••">
+                </div>
+                <button class="btn btn-primary" id="createBtn" onclick="register()">Create Account</button>
+                <button class="btn btn-secondary" id="backBtn" onclick="showLogin()">Back to Sign In</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="appScreen" class="app-container">
+        <div class="header">
+            <h1>🎯 Habit Tracker</h1>
+            <div class="user-section">
+                <div class="user-info">
+                    <div class="name" id="userName">User</div>
+                    <div class="email" id="userEmail">guest@local</div>
+                </div>
+                <div class="avatar" id="userAvatar">U</div>
+                <button class="btn-logout" id="logoutBtn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Progress Track -->
+            <div class="progress-section">
+                <div class="progress-title">Your Progress</div>
+                <div style="position: relative;">
+                    <div class="milestones">
+                        <div class="milestone">100+</div>
+                        <div class="milestone">50</div>
+                        <div class="milestone">15</div>
+                        <div class="milestone">5</div>
+                        <div class="milestone">0</div>
+                    </div>
+                    <div class="vertical-track">
+                        <div class="progress-fill" id="progressFill">
+                            <div class="character" id="character">🚀</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="progress-stats">
+                    <div class="stat">
+                        <span class="stat-label">Total Points:</span>
+                        <span class="stat-value" id="totalPoints">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Active Habits:</span>
+                        <span class="stat-value" id="activeCount">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">This Month:</span>
+                        <span class="stat-value" id="monthPoints">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Add Habit -->
+                <div class="section">
+                    <div class="section-title">➕ Add New Habit</div>
+                    <div class="add-habit-form">
+                        <input type="text" id="habitInput" placeholder="e.g., Running, Reading, Meditation..." maxlength="50">
+                        <button class="btn-add" id="addHabitBtn" onclick="addHabit()">Add</button>
+                    </div>
+                </div>
+
+                <!-- Active Habits -->
+                <div class="section">
+                    <div class="section-title">📋 Active Habits</div>
+                    <div class="habits-list" id="habitsList">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <p>No habits yet. Start by adding one!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History -->
+                <div class="section">
+                    <div class="section-title">📊 History</div>
+                    <table class="history-table" id="historyTable">
+                        <thead>
+                            <tr>
+                                <th>Habit</th>
+                                <th>Streak</th>
+                                <th>Total Points</th>
+                                <th>Last Logged</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody">
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: #999;">No history yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Completed Habits -->
+                <div class="section">
+                    <div class="section-title">✅ Completed Habits</div>
+                    <div id="completedList">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🎉</div>
+                            <p>No completed habits yet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOG HABIT MODAL -->
+    <div id="logHabitModal" class="modal">
+        <div class="modal-content">
+            <h2>Log Habit</h2>
+            <p id="logHabitName" style="font-size: 16px; color: #667eea; font-weight: 600; margin-bottom: 20px;"></p>
+
+            <div style="text-align: left;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">How many minutes?</label>
+                <p style="font-size: 12px; color: #999; margin-bottom: 12px;">💡 Tip: Multiples of 15 = 1 point (15=1pt, 30=2pts, 45=3pts, 60=4pts)</p>
+                <div class="time-buttons">
+                    <button class="time-btn" onclick="selectTime(15)">15 min</button>
+                    <button class="time-btn" onclick="selectTime(30)">30 min</button>
+                    <button class="time-btn" onclick="selectTime(45)">45 min</button>
+                    <button class="time-btn" onclick="selectTime(60)">60 min</button>
+                </div>
+                <input type="number" id="customTime" class="modal-input" placeholder="or enter custom minutes" min="1" oninput="updatePointsPreview()">
+                <p id="pointsPreview" style="font-size: 13px; color: #667eea; font-weight: 600; margin-top: 8px; text-align: center;"></p>
+            </div>
+
+            <div class="modal-actions">
+                <button class="modal-close" onclick="closeLogModal()">Cancel</button>
+                <button style="background: #667eea; color: white;" onclick="confirmLogHabit()">Log</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- COMPLETION MODAL -->
+    <div id="completionModal" class="modal">
+        <div class="modal-content">
+            <h2>🎉 Habit Complete!</h2>
+            <div class="modal-stat">
+                <span class="stat-label">Habit</span>
+                <span class="value" id="completedHabitName">Habit Name</span>
+            </div>
+            <div class="modal-stat">
+                <span class="stat-label">Final Streak</span>
+                <span class="value" id="finalStreak">0 days</span>
+            </div>
+            <div class="modal-stat">
+                <span class="stat-label">Total Points</span>
+                <span class="value" id="totalEarned">0 points</span>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-close" id="closeModalBtn" onclick="closeCompletionModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase SDK -->
+    <script async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // ========== SUPABASE CONFIG ==========
+        const SUPABASE_URL = 'https://kpvifxpxatosmaumldry.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwdmlmeHB4YXRvc21hdW1sZHJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0NDcyODEsImV4cCI6MjEwNTAyMzI4MX0.LCrNpv1dR10KRO7WBh-nfhkdp-nO0cYaAUeiKXpjTWQ';
+
+        let supabase = null;
+
+        function initSupabase() {
+            if (window.supabase && !supabase) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            }
+            return supabase;
+        }
+
+        // ========== STATE ==========
+        let currentUser = null;
+        let habits = [];
+        let isGuest = false;
+        let logModalHabitId = null;
+        let selectedTime = null;
+
+        // ========== AUTH FUNCTIONS ==========
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showError('Please fill in all fields');
+                return;
+            }
+
+            try {
+                const sb = initSupabase();
+                if (!sb) {
+                    showError('Supabase not available. Try guest mode.');
+                    return;
+                }
+
+                const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+                if (error) {
+                    showError(error.message);
+                    return;
+                }
+
+                currentUser = data.user;
+                showToast(`Welcome back, ${email}! 🎉`, 'success');
+                document.getElementById('userName').textContent = email.split('@')[0];
+                document.getElementById('userEmail').textContent = email;
+                document.getElementById('userAvatar').textContent = email[0].toUpperCase();
+
+                // Clear auth forms
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+
+                await loadHabits();
+                showApp();
+            } catch (err) {
+                showError('Login failed: ' + err.message);
+            }
+        }
+
+        async function register() {
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirm = document.getElementById('registerConfirm').value;
+            const name = document.getElementById('registerName').value;
+
+            if (!email || !password || !confirm || !name) {
+                showError('Please fill in all fields');
+                return;
+            }
+
+            if (password !== confirm) {
+                showError('Passwords do not match');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters');
+                return;
+            }
+
+            try {
+                const sb = initSupabase();
+                if (!sb) {
+                    showError('Supabase not available. Try guest mode.');
+                    return;
+                }
+
+                const { data, error } = await sb.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: { display_name: name }
+                    }
+                });
+
+                if (error) {
+                    showError(error.message);
+                    return;
+                }
+
+                currentUser = data.user;
+                showToast(`Account created! Welcome, ${name}! 🎉`, 'success');
+                document.getElementById('userName').textContent = name;
+                document.getElementById('userEmail').textContent = email;
+                document.getElementById('userAvatar').textContent = name[0].toUpperCase();
+
+                // Clear register form
+                document.getElementById('registerEmail').value = '';
+                document.getElementById('registerPassword').value = '';
+                document.getElementById('registerConfirm').value = '';
+                document.getElementById('registerName').value = '';
+
+                showApp();
+            } catch (err) {
+                showError('Registration failed: ' + err.message);
+            }
+        }
+
+        function guestMode() {
+            isGuest = true;
+            currentUser = { id: 'guest', email: 'guest@local' };
+            document.getElementById('userName').textContent = 'Guest User';
+            document.getElementById('userEmail').textContent = 'Local storage only';
+            document.getElementById('userAvatar').textContent = 'G';
+
+            // Load habits from localStorage for guest
+            const stored = localStorage.getItem('habits_guest');
+            habits = stored ? JSON.parse(stored) : [];
+
+            showApp();
+            showToast('Entered guest mode 👤', 'success');
+        }
+
+        async function logout() {
+            try {
+                if (!isGuest) {
+                    const sb = initSupabase();
+                    if (sb) await sb.auth.signOut();
+                }
+                currentUser = null;
+                habits = [];
+                isGuest = false;
+                showAuth();
+                showToast('Logged out successfully', 'success');
+            } catch (err) {
+                console.error('Logout error:', err);
+                currentUser = null;
+                habits = [];
+                isGuest = false;
+                showAuth();
+            }
+        }
+
+        // ========== SUPABASE DATA FUNCTIONS ==========
+        async function loadHabits() {
+            if (isGuest) {
+                const stored = localStorage.getItem('habits_guest');
+                habits = stored ? JSON.parse(stored) : [];
+                return;
+            }
+
+            try {
+                const sb = initSupabase();
+                if (!sb || !currentUser) return;
+
+                const { data, error } = await sb
+                    .from('habits')
+                    .select('*')
+                    .eq('user_id', currentUser.id);
+
+                if (error) throw error;
+                habits = data || [];
+            } catch (err) {
+                console.error('Load habits error:', err);
+                showError('Could not load habits');
+            }
+        }
+
+        async function saveHabits() {
+            if (isGuest) {
+                localStorage.setItem('habits_guest', JSON.stringify(habits));
+                return;
+            }
+
+            try {
+                const sb = initSupabase();
+                if (!sb || !currentUser) return;
+
+                for (let habit of habits) {
+                    if (habit.id === Date.now() || typeof habit.id === 'number') {
+                        // New habit - insert
+                        const { error } = await sb.from('habits').insert([{
+                            user_id: currentUser.id,
+                            name: habit.name,
+                            streak: habit.streak,
+                            lastLoggedDate: habit.lastLoggedDate,
+                            totalPoints: habit.totalPoints,
+                            timeSpentToday: habit.timeSpentToday,
+                            isDeleted: habit.isDeleted,
+                            isCompleted: habit.isCompleted,
+                            completedAt: habit.completedAt
+                        }]);
+                        if (error) console.error('Insert habit error:', error);
+                    } else {
+                        // Existing habit - update
+                        const { error } = await sb
+                            .from('habits')
+                            .update(habit)
+                            .eq('id', habit.id)
+                            .eq('user_id', currentUser.id);
+                        if (error) console.error('Update habit error:', error);
+                    }
+                }
+            } catch (err) {
+                console.error('Save habits error:', err);
+            }
+        }
+
+        // ========== HABIT FUNCTIONS ==========
+        async function addHabit() {
+            const input = document.getElementById('habitInput');
+            const name = input.value.trim();
+
+            if (!name) {
+                showError('Please enter a habit name');
+                return;
+            }
+
+            const newHabit = {
+                id: Date.now(),
+                name,
+                streak: 0,
+                lastLoggedDate: null,
+                totalPoints: 0,
+                timeSpentToday: 0,
+                isDeleted: false,
+                isCompleted: false,
+                completedAt: null
+            };
+
+            habits.push(newHabit);
+            await saveHabits();
+            showToast(`Habit added! 🎉 "${name}"`, 'success');
+            input.value = '';
+            renderHabits();
+            updateStats();
+        }
+
+        function renderHabits() {
+            const list = document.getElementById('habitsList');
+            const activeHabits = habits.filter(h => !h.isDeleted && !h.isCompleted);
+
+            if (activeHabits.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>No habits yet. Start by adding one!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = activeHabits.map(habit => `
+                <div class="habit-item">
+                    <div class="habit-info">
+                        <div class="habit-name">${habit.name}</div>
+                        <div class="habit-stats">
+                            <span>🔥 Streak: ${habit.streak || 0} days</span>
+                            <span>⭐ Points: ${habit.totalPoints || 0} ${habit.timeSpentToday > 0 ? `(${habit.timeSpentToday} min today)` : ''}</span>
+                        </div>
+                    </div>
+                    <div class="habit-actions">
+                        <button class="btn-small btn-log" onclick="openLogModal(${habit.id})">Log Habit</button>
+                        <button class="btn-small btn-complete" onclick="openCompletionModal(${habit.id})">Done</button>
+                        <button class="btn-small btn-delete" onclick="deleteHabit(${habit.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const tbody = document.getElementById('historyBody');
+            const activeHabits = habits.filter(h => !h.isDeleted && !h.isCompleted);
+
+            if (activeHabits.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #999;">No history yet</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = activeHabits.map(habit => `
+                <tr>
+                    <td>${habit.name}</td>
+                    <td>${habit.streak || 0} days</td>
+                    <td>${habit.totalPoints || 0} points</td>
+                    <td>${habit.lastLoggedDate ? new Date(habit.lastLoggedDate).toLocaleDateString() : 'Never'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function openLogModal(habitId) {
+            const habit = habits.find(h => h.id === habitId);
+            if (!habit) return;
+
+            logModalHabitId = habitId;
+            selectedTime = null;
+            document.getElementById('logHabitName').textContent = habit.name;
+            document.getElementById('customTime').value = '';
+
+            // Reset time button styles
+            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById('logHabitModal').style.display = 'flex';
+        }
+
+        function selectTime(minutes) {
+            selectedTime = minutes;
+            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('customTime').value = '';
+            updatePointsPreview();
+        }
+
+        function updatePointsPreview() {
+            const customTime = parseInt(document.getElementById('customTime').value);
+            const minutes = customTime || selectedTime;
+            const preview = document.getElementById('pointsPreview');
+
+            if (!minutes) {
+                preview.textContent = '';
+                return;
+            }
+
+            const points = Math.floor(minutes / 15);
+            const remainder = minutes % 15;
+
+            if (remainder === 0) {
+                preview.textContent = `✅ ${minutes} min = ${points} point${points !== 1 ? 's' : ''}`;
+            } else {
+                preview.textContent = `⚠️ ${minutes} min = ${points} point${points !== 1 ? 's' : ''} (${remainder} min unused)`;
+            }
+        }
+
+        function confirmLogHabit() {
+            const customTime = parseInt(document.getElementById('customTime').value);
+            const minutes = customTime || selectedTime;
+
+            if (!minutes) {
+                showError('Please select or enter a time');
+                return;
+            }
+
+            if (minutes < 1) {
+                showError('Time must be at least 1 minute');
+                return;
+            }
+
+            logHabit(logModalHabitId, minutes);
+            closeLogModal();
+        }
+
+        function closeLogModal() {
+            document.getElementById('logHabitModal').style.display = 'none';
+            logModalHabitId = null;
+            selectedTime = null;
+        }
+
+        async function logHabit(habitId, minutes) {
+            const habit = habits.find(h => h.id === habitId);
+            if (!habit) return;
+
+            const today = new Date().toISOString().split('T')[0];
+            const lastLog = habit.lastLoggedDate;
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+            // Check if streak continues
+            if (lastLog === today) {
+                // Already logged today - add to time, recalculate points based on total time
+                const oldPoints = Math.floor(habit.timeSpentToday / 15);
+                habit.timeSpentToday += minutes;
+                const newPoints = Math.floor(habit.timeSpentToday / 15);
+                const pointsEarned = newPoints - oldPoints;
+                habit.totalPoints += pointsEarned;
+                showToast(`Added ${minutes} mins. Total today: ${habit.timeSpentToday} min = ${newPoints} point${newPoints !== 1 ? 's' : ''} 🎉`, 'success');
+            } else if (lastLog === yesterdayStr) {
+                // Streak continues
+                habit.streak += 1;
+                habit.timeSpentToday = minutes;
+                const pointsEarned = Math.floor(minutes / 15);
+                habit.totalPoints += pointsEarned;
+                habit.lastLoggedDate = today;
+                showToast(`Logged ${minutes} mins = ${pointsEarned} point${pointsEarned !== 1 ? 's' : ''}! Streak: ${habit.streak} days 🔥`, 'success');
+            } else if (lastLog === null) {
+                // First log
+                habit.streak = 1;
+                habit.timeSpentToday = minutes;
+                const pointsEarned = Math.floor(minutes / 15);
+                habit.totalPoints += pointsEarned;
+                habit.lastLoggedDate = today;
+                showToast(`Logged ${minutes} mins = ${pointsEarned} point${pointsEarned !== 1 ? 's' : ''}! 🎉`, 'success');
+            } else {
+                // Streak broken - PENALTY: lose all points
+                showToast(`⚠️ Streak broken for "${habit.name}"! Lost ${habit.totalPoints} points.`, 'warning');
+                habit.streak = 1;
+                habit.timeSpentToday = minutes;
+                const pointsEarned = Math.floor(minutes / 15);
+                habit.totalPoints = pointsEarned;
+                habit.lastLoggedDate = today;
+            }
+
+            await saveHabits();
+            renderHabits();
+            updateStats();
+        }
+
+        async function deleteHabit(habitId) {
+            if (!confirm('Are you sure? This habit will be removed.')) return;
+
+            const habit = habits.find(h => h.id === habitId);
+            habit.isDeleted = true;
+
+            await saveHabits();
+            showToast(`${habit.name} removed`, 'success');
+            renderHabits();
+            updateStats();
+        }
+
+        async function openCompletionModal(habitId) {
+            const habit = habits.find(h => h.id === habitId);
+            if (!habit) return;
+
+            document.getElementById('completedHabitName').textContent = habit.name;
+            document.getElementById('finalStreak').textContent = `${habit.streak || 0} days`;
+            document.getElementById('totalEarned').textContent = `${habit.totalPoints || 0} points`;
+            document.getElementById('completionModal').style.display = 'flex';
+
+            setTimeout(() => {
+                completeHabit(habitId);
+            }, 100);
+        }
+
+        async function completeHabit(habitId) {
+            const habit = habits.find(h => h.id === habitId);
+            if (!habit) return;
+
+            habit.isCompleted = true;
+            habit.completedAt = new Date();
+
+            await saveHabits();
+            renderHabits();
+            loadCompletedHabits();
+        }
+
+        function closeCompletionModal() {
+            document.getElementById('completionModal').style.display = 'none';
+        }
+
+        function loadCompletedHabits() {
+            const completed = habits.filter(h => h.isCompleted);
+            const list = document.getElementById('completedList');
+
+            if (completed.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🎉</div>
+                        <p>No completed habits yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = completed.map(habit => `
+                <div class="habit-item" style="opacity: 0.7;">
+                    <div class="habit-info">
+                        <div class="habit-name">✅ ${habit.name}</div>
+                        <div class="habit-stats">
+                            <span>Completed on ${new Date(habit.completedAt).toLocaleDateString()}</span>
+                            <span>Final Score: ${habit.totalPoints || 0} points</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ========== STATS & PROGRESS ==========
+        function updateStats() {
+            const activeHabits = habits.filter(h => !h.isDeleted && !h.isCompleted);
+            const totalPoints = activeHabits.reduce((sum, h) => sum + (h.totalPoints || 0), 0);
+            // Only count habits with streak > 0 as truly active
+            const activeCount = activeHabits.filter(h => h.streak > 0).length;
+
+            const monthStart = new Date();
+            monthStart.setDate(1);
+            const monthPoints = activeHabits.reduce((sum, h) => {
+                if (h.lastLoggedDate) {
+                    const lastLog = new Date(h.lastLoggedDate);
+                    if (lastLog >= monthStart) {
+                        return sum + (h.totalPoints || 0);
+                    }
+                }
+                return sum;
+            }, 0);
+
+            document.getElementById('totalPoints').textContent = totalPoints;
+            document.getElementById('activeCount').textContent = activeCount;
+            document.getElementById('monthPoints').textContent = monthPoints;
+
+            const percentage = Math.min((totalPoints / 100) * 100, 100);
+            document.getElementById('progressFill').style.height = percentage + '%';
+        }
+
+        // ========== UI FUNCTIONS ==========
+        function showAuth() {
+            document.getElementById('authScreen').style.display = 'flex';
+            document.getElementById('appScreen').style.display = 'none';
+        }
+
+        function showApp() {
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('appScreen').style.display = 'block';
+            renderHabits();
+            loadCompletedHabits();
+            updateStats();
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            setTimeout(() => {
+                errorEl.style.display = 'none';
+            }, 5000);
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        function showLogin() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        function showRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const sb = initSupabase();
+                if (sb) {
+                    const { data: { user } } = await sb.auth.getUser();
+                    if (user) {
+                        currentUser = user;
+                        document.getElementById('userName').textContent = user.email?.split('@')[0] || 'User';
+                        document.getElementById('userEmail').textContent = user.email || '';
+                        document.getElementById('userAvatar').textContent = (user.email || 'U')[0].toUpperCase();
+                        await loadHabits();
+                        showApp();
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.error('Init error:', err);
+            }
+            showAuth();
+        });
+    </script>
+</body>
+</html>
