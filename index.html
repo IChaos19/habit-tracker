@@ -1041,7 +1041,11 @@
 
             try {
                 const sb = initSupabase();
-                if (!sb || !currentUser) return;
+                if (!sb || !currentUser) {
+                    console.error('Save failed: No Supabase or currentUser', { sb: !!sb, currentUser });
+                    return;
+                }
+                console.log('Saving habits for user:', currentUser.id);
 
                 for (let habit of habits) {
                     if (!habit.id || habit.id > Date.now() - 86400000) {
