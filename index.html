@@ -710,6 +710,7 @@
             document.getElementById('modalHabitName').textContent = 'Log: ' + h.name;
             document.getElementById('customMinutes').value = '';
             document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('pointsPreview').textContent = 'Every 15 mins is 1 point';
             document.getElementById('logModal').classList.add('active');
         }
 
@@ -730,11 +731,11 @@
         function updatePointsPreview() {
             let mins = selectedMinutes || parseInt(document.getElementById('customMinutes').value);
             if (!mins || mins < 1) {
-                document.getElementById('pointsPreview').textContent = '';
+                document.getElementById('pointsPreview').textContent = 'Every 15 mins is 1 point';
                 return;
             }
             const points = Math.floor(mins / 15);
-            document.getElementById('pointsPreview').textContent = `You'll earn ${points} ${points === 1 ? 'point' : 'points'}`;
+            document.getElementById('pointsPreview').textContent = `For: ${mins} mins you will get: ${points} ${points === 1 ? 'point' : 'points'}`;
 
             // Clear selected button if user is typing in custom field
             const customInput = document.getElementById('customMinutes');
