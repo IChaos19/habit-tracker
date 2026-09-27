@@ -232,7 +232,14 @@
                 if (!sb || !currentUser) return;
                 const { data, error } = await sb.from('habits').select('*').eq('user_id', currentUser.id);
                 if (error) throw error;
-                habits = data || [];
+                habits = (data || []).map(h => ({
+                    id: h.id,
+                    name: h.name,
+                    streak: h.streak || 0,
+                    lastLoggedDate: h.last_logged_date,
+                    totalPoints: h.total_points || 0,
+                    isDeleted: h.is_deleted || false
+                }));
             } catch (err) {
                 console.error('Load error:', err);
             }
@@ -247,24 +254,21 @@
                 const sb = initSupabase();
                 if (!sb || !currentUser) return;
                 for (let h of habits) {
+                    const dbRecord = {
+                        name: h.name,
+                        streak: h.streak || 0,
+                        last_logged_date: h.lastLoggedDate,
+                        total_points: h.totalPoints || 0,
+                        is_deleted: h.isDeleted || false
+                    };
                     if (!h.id || h.id > Date.now() - 86400000) {
                         const { data, error } = await sb.from('habits').insert([{
                             user_id: currentUser.id,
-                            name: h.name,
-                            streak: h.streak,
-                            last_logged_date: h.lastLoggedDate,
-                            total_points: h.totalPoints,
-                            is_deleted: h.isDeleted
+                            ...dbRecord
                         }]).select();
                         if (data && data[0]) h.id = data[0].id;
                     } else {
-                        await sb.from('habits').update({
-                            name: h.name,
-                            streak: h.streak,
-                            last_logged_date: h.lastLoggedDate,
-                            total_points: h.totalPoints,
-                            is_deleted: h.isDeleted
-                        }).eq('id', h.id).eq('user_id', currentUser.id);
+                        await sb.from('habits').update(dbRecord).eq('id', h.id).eq('user_id', currentUser.id);
                     }
                 }
             } catch (err) {
