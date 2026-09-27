@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Habit Tracker v3.2.0</title>
+    <title>Habit Tracker v3.2.1</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -27,23 +27,24 @@
         .sidebar h3 { color: #333; margin-bottom: 20px; font-size: 18px; }
         .progress-bar {
             background: #E8E8E8;
-            height: 200px;
+            height: 40px;
             border-radius: 20px;
             position: relative;
             overflow: hidden;
             margin-bottom: 20px;
         }
         .progress-fill {
-            background: linear-gradient(180deg, #7B68EE 0%, #9B88EE 100%);
+            background: linear-gradient(90deg, #7B68EE 0%, #9B88EE 100%);
             height: 100%;
             border-radius: 20px;
-            transition: height 0.3s ease;
+            transition: width 0.3s ease;
             display: flex;
-            align-items: flex-end;
+            align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
-            padding-bottom: 10px;
+            font-size: 14px;
+            width: 0%;
         }
         .progress-labels {
             display: flex;
@@ -51,7 +52,7 @@
             font-size: 12px;
             color: #999;
             padding: 0 10px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         .stats { font-size: 13px; color: #666; line-height: 1.8; }
         .stats div { margin: 8px 0; }
@@ -320,6 +321,45 @@
             color: #333;
         }
         .auth-button.secondary:hover { background: #E8E8E8; }
+
+        /* TOAST NOTIFICATION */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+            max-width: 300px;
+            font-size: 14px;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+        .toast.out {
+            animation: slideOut 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -493,6 +533,18 @@
             setTimeout(() => { el.style.display = 'none'; }, 5000);
         }
 
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('out');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
         async function login() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
@@ -590,7 +642,7 @@
                     habits = [];
                     renderHabits();
                     updateStats();
-                    alert('All guest data has been cleared! Start fresh now.');
+                    showToast('✓ All data cleared! Ready for a fresh start.');
                 } else {
                     // Delete all habits from database
                     const sb = initSupabase();
@@ -598,14 +650,14 @@
 
                     const { error } = await sb.from('habits').delete().eq('user_id', currentUser.id);
                     if (error) {
-                        alert('Error deleting data: ' + error.message);
+                        showToast('Error: ' + error.message);
                         return;
                     }
 
                     habits = [];
                     renderHabits();
                     updateStats();
-                    alert('All your data has been cleared! Start fresh now.');
+                    showToast('✓ All data cleared! Ready for a fresh start.');
                 }
             } catch (err) {
                 alert('Error resetting data: ' + err.message);
@@ -738,8 +790,8 @@
             const maxPoints = 200;
             const progress = Math.min((totalPoints / maxPoints) * 100, 100);
 
-            document.getElementById('progressFill').style.height = progress + '%';
-            document.getElementById('progressFill').textContent = Math.round(progress);
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressFill').textContent = Math.round(progress) + '%';
             document.getElementById('totalPoints').textContent = totalPoints;
             document.getElementById('activeHabits').textContent = active.length;
             document.getElementById('thisMonth').textContent = active.filter(h => h.lastLoggedDate && new Date(h.lastLoggedDate).getMonth() === new Date().getMonth()).length;
@@ -809,7 +861,7 @@
             renderHabits();
             updateStats();
             closeModal();
-            alert('Logged ' + mins + ' minutes! Total: ' + h.minutesLogged + ' mins (' + h.totalPoints + ' points)');
+            showToast('Logged ' + mins + ' mins! Total: ' + h.minutesLogged + ' mins (' + h.totalPoints + ' points)');
         }
 
         function completeHabit(habitId) {
@@ -819,7 +871,7 @@
                 saveHabits();
                 renderHabits();
                 updateStats();
-                alert(h.name + ' marked as done!');
+                showToast(h.name + ' marked as done! ✓');
             }
         }
 
