@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Habit Tracker v3.1.2 Fixed</title>
+    <title>Habit Tracker v3.1.3</title>
     <style>
         body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
         .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
@@ -11,6 +11,7 @@
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .user-info { font-size: 12px; color: #666; }
         .btn-logout { padding: 8px 16px; background: #ff6b6b; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-logout:hover { background: #ff5252; }
         .auth-screen { display: none; }
         .app-screen { display: none; }
         .habits { margin-top: 20px; }
@@ -19,7 +20,8 @@
         button:hover { background: #764ba2; }
         button.secondary { background: #f5f5f5; color: #333; }
         button.secondary:hover { background: #e8e8e8; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        button.logout { background: #ff6b6b; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
         .modal.active { display: flex; }
         .modal-content { background: white; padding: 30px; border-radius: 8px; min-width: 300px; }
         .modal-content h2 { margin-top: 0; }
@@ -27,16 +29,21 @@
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
         .error { color: #ff6b6b; font-size: 12px; margin: 10px 0; }
+        .success { color: #51cf66; font-size: 12px; margin: 10px 0; }
         .empty-state { text-align: center; padding: 20px; color: #999; }
         .btn-add { width: 100%; }
-        .debug-log { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 4px; font-size: 11px; font-family: monospace; max-height: 200px; overflow-y: auto; }
     </style>
 </head>
 <body>
+    <!-- AUTH SCREEN -->
     <div id="authScreen" class="auth-screen">
         <div class="container">
             <h1>🎯 Habit Tracker</h1>
+            <p>Build better habits, one day at a time</p>
+
             <div id="authError" class="error"></div>
+
+            <!-- Login Form -->
             <div id="loginForm">
                 <div class="form-group">
                     <label>Email</label>
@@ -48,8 +55,10 @@
                 </div>
                 <button onclick="login()">Sign In</button>
                 <button class="secondary" onclick="toggleRegister()">Create Account</button>
-                <button class="secondary" onclick="guestMode()">Guest Mode</button>
+                <button class="secondary" onclick="guestMode()">Continue as Guest</button>
             </div>
+
+            <!-- Register Form -->
             <div id="registerForm" style="display: none;">
                 <div class="form-group">
                     <label>Email</label>
@@ -68,28 +77,31 @@
                     <input type="password" id="registerConfirm" placeholder="••••••••">
                 </div>
                 <button onclick="register()">Create Account</button>
-                <button class="secondary" onclick="toggleRegister()">Back</button>
+                <button class="secondary" onclick="toggleRegister()">Back to Sign In</button>
             </div>
         </div>
     </div>
 
+    <!-- APP SCREEN -->
     <div id="appScreen" class="app-screen">
         <div class="container">
             <div class="header">
                 <h1>🎯 Habit Tracker</h1>
                 <div>
                     <div class="user-info" id="userEmail"></div>
-                    <button class="btn-logout" onclick="logout()">Logout</button>
+                    <button class="logout btn-logout" onclick="logout()">Logout</button>
                 </div>
             </div>
 
             <button class="btn-add" onclick="addHabitUI()">Add New Habit</button>
-            <div class="habits" id="habitsList">No habits</div>
 
-            <div class="debug-log" id="debugLog" style="display: none;">Debug Log</div>
+            <div class="habits" id="habitsList">
+                <div class="empty-state">No habits yet. Click "Add New Habit" to get started!</div>
+            </div>
         </div>
     </div>
 
+    <!-- LOG HABIT MODAL -->
     <div id="logModal" class="modal">
         <div class="modal-content">
             <h2>Log Habit</h2>
@@ -100,6 +112,7 @@
         </div>
     </div>
 
+    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
@@ -112,17 +125,9 @@
         let isGuest = false;
         let selectedHabitId = null;
 
-        function log(msg) {
-            console.log(msg);
-            const debugEl = document.getElementById('debugLog');
-            debugEl.textContent += msg + '\n';
-            debugEl.style.display = 'block';
-        }
-
         function initSupabase() {
             if (window.supabase && !sbClient) {
                 sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                log('✓ Supabase initialized');
             }
             return sbClient;
         }
@@ -131,22 +136,28 @@
             const el = document.getElementById('authError');
             el.textContent = msg;
             el.style.display = 'block';
-            log('ERROR: ' + msg);
             setTimeout(() => { el.style.display = 'none'; }, 5000);
         }
 
         async function login() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            if (!email || !password) { showError('Fill all fields'); return; }
+            if (!email || !password) {
+                showError('Please fill in all fields');
+                return;
+            }
             try {
                 const sb = initSupabase();
-                if (!sb) { showError('Supabase unavailable'); return; }
-                log('Attempting login...');
+                if (!sb) {
+                    showError('Supabase not available. Try guest mode.');
+                    return;
+                }
                 const { data, error } = await sb.auth.signInWithPassword({ email, password });
-                if (error) { showError(error.message); return; }
+                if (error) {
+                    showError(error.message);
+                    return;
+                }
                 currentUser = data.user;
-                log('✓ Login successful: ' + email);
                 document.getElementById('loginEmail').value = '';
                 document.getElementById('loginPassword').value = '';
                 await loadHabits();
@@ -161,15 +172,26 @@
             const password = document.getElementById('registerPassword').value;
             const confirm = document.getElementById('registerConfirm').value;
             const name = document.getElementById('registerName').value;
-            if (!email || !password || !confirm || !name) { showError('Fill all fields'); return; }
-            if (password !== confirm) { showError('Passwords do not match'); return; }
+            if (!email || !password || !confirm || !name) {
+                showError('Please fill all fields');
+                return;
+            }
+            if (password !== confirm) {
+                showError('Passwords do not match');
+                return;
+            }
             try {
                 const sb = initSupabase();
-                log('Attempting registration...');
                 const { data, error } = await sb.auth.signUp({ email, password, options: { data: { display_name: name } } });
-                if (error) { showError(error.message); return; }
+                if (error) {
+                    showError(error.message);
+                    return;
+                }
                 currentUser = data.user;
-                log('✓ Registration successful');
+                document.getElementById('registerEmail').value = '';
+                document.getElementById('registerPassword').value = '';
+                document.getElementById('registerConfirm').value = '';
+                document.getElementById('registerName').value = '';
                 toggleRegister();
                 showApp();
             } catch (err) {
@@ -181,7 +203,6 @@
             isGuest = true;
             currentUser = { id: 'guest', email: 'guest@local' };
             habits = JSON.parse(localStorage.getItem('habits_guest') || '[]');
-            log('✓ Guest mode');
             showApp();
         }
 
@@ -209,7 +230,6 @@
             try {
                 const sb = initSupabase();
                 if (!sb || !currentUser) return;
-                log('Loading habits from Supabase...');
                 const { data, error } = await sb.from('habits').select('*').eq('user_id', currentUser.id);
                 if (error) throw error;
                 habits = (data || []).map(h => ({
@@ -220,9 +240,8 @@
                     totalPoints: h.total_points || 0,
                     isDeleted: h.is_deleted || false
                 }));
-                log('✓ Loaded ' + habits.length + ' habits');
             } catch (err) {
-                log('ERROR loading: ' + err.message);
+                console.error('Load error:', err);
             }
         }
 
@@ -243,52 +262,62 @@
                         is_deleted: h.isDeleted || false
                     };
                     if (!h.id || h.id > Date.now() - 86400000) {
-                        const { data, error } = await sb.from('habits').insert([{ user_id: currentUser.id, ...dbRecord }]).select();
+                        const { data, error } = await sb.from('habits').insert([{
+                            user_id: currentUser.id,
+                            ...dbRecord
+                        }]).select();
                         if (data && data[0]) h.id = data[0].id;
                     } else {
                         await sb.from('habits').update(dbRecord).eq('id', h.id).eq('user_id', currentUser.id);
                     }
                 }
-                log('✓ Habits saved');
             } catch (err) {
-                log('ERROR saving: ' + err.message);
+                console.error('Save error:', err);
             }
         }
 
         function addHabitUI() {
             const name = prompt('Habit name:');
             if (name && name.trim()) {
-                habits.push({ id: Date.now(), name: name.trim(), streak: 0, lastLoggedDate: null, totalPoints: 0, isDeleted: false });
-                log('Added habit: ' + name);
+                habits.push({
+                    id: Date.now(),
+                    name: name.trim(),
+                    streak: 0,
+                    lastLoggedDate: null,
+                    totalPoints: 0,
+                    isDeleted: false
+                });
                 saveHabits();
                 renderHabits();
             }
         }
 
         function renderHabits() {
-            log('Rendering ' + habits.length + ' habits');
             const list = document.getElementById('habitsList');
             const active = habits.filter(h => !h.isDeleted);
             if (active.length === 0) {
-                list.innerHTML = '<div class="empty-state">No habits</div>';
+                list.innerHTML = '<div class="empty-state">No habits yet. Click "Add New Habit" to get started!</div>';
                 return;
             }
-            const html = active.map(h => {
-                log('Habit: id=' + h.id + ' name=' + h.name + ' points=' + h.totalPoints);
-                return '<div class="habit-item"><div><strong>' + h.name + '</strong><br><small>Streak: ' + h.streak + ' days | Points: ' + h.totalPoints + '</small></div><button type="button" onclick="openLogModal(\'' + h.id + '\')">Log</button></div>';
-            }).join('');
-            list.innerHTML = html;
+            list.innerHTML = active.map(h => `
+                <div class="habit-item">
+                    <div>
+                        <strong>${h.name}</strong>
+                        <br>
+                        <small>Streak: ${h.streak} days | Points: ${h.totalPoints}</small>
+                    </div>
+                    <button onclick="openLogModal('${h.id}')">Log</button>
+                </div>
+            `).join('');
         }
 
         function openLogModal(habitId) {
-            log('openLogModal called with id: ' + habitId);
             const h = habits.find(x => x.id === habitId);
-            if (!h) { log('Habit not found!'); return; }
+            if (!h) return;
             selectedHabitId = habitId;
             document.getElementById('habitName').textContent = 'Log: ' + h.name;
             document.getElementById('minutes').value = '30';
             document.getElementById('logModal').classList.add('active');
-            log('Modal opened for: ' + h.name);
         }
 
         function closeModal() {
@@ -297,15 +326,16 @@
         }
 
         function logHabit() {
-            log('logHabit called');
             const mins = parseInt(document.getElementById('minutes').value);
-            if (!mins || mins < 1) { alert('Enter valid minutes'); return; }
+            if (!mins || mins < 1) {
+                alert('Enter valid minutes');
+                return;
+            }
             const h = habits.find(x => x.id === selectedHabitId);
-            if (!h) { log('ERROR: habit not found'); return; }
+            if (!h) return;
             h.totalPoints += Math.floor(mins / 15);
             h.lastLoggedDate = new Date().toISOString().split('T')[0];
             h.streak = Math.max(1, h.streak);
-            log('Logged ' + mins + ' mins for: ' + h.name);
             saveHabits();
             renderHabits();
             closeModal();
@@ -330,7 +360,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', async function() {
-            log('Page loaded');
             try {
                 const sb = initSupabase();
                 if (sb) {
@@ -343,7 +372,7 @@
                     }
                 }
             } catch (err) {
-                log('Init error: ' + err.message);
+                console.error('Init error:', err);
             }
             showAuth();
         });
