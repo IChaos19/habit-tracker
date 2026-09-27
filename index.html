@@ -3,400 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Habit Tracker v3.0.9</title>
+    <title>Habit Tracker v3.0.10</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
-        .container { width: 100%; max-width: 900px; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); overflow: hidden; }
-        .auth-container { padding: 60px 40px; text-align: center; }
-        .auth-container h1 { color: #333; margin-bottom: 10px; font-size: 32px; }
-        .form-group { margin-bottom: 16px; text-align: left; }
-        .form-group label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; font-size: 14px; }
-        .form-group input { width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; }
-        .form-group input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
-        .btn { padding: 12px 32px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin: 8px 4px; }
-        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; width: 100%; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3); }
-        .btn-secondary { background: #f5f5f5; color: #333; width: 100%; margin-top: 12px; }
-        .btn-secondary:hover { background: #e8e8e8; }
-        .error-message { background: #fee; color: #c33; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; display: none; }
-        .app-container { display: none; height: 100vh; overflow-y: auto; background: #f8f9fa; }
-        .header { background: white; padding: 20px 40px; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .header h1 { font-size: 24px; color: #333; }
-        .user-section { display: flex; align-items: center; gap: 16px; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 18px; }
-        .btn-logout { background: #fee; color: #c33; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; }
-        .btn-logout:hover { background: #fdd; }
-        .content { padding: 40px; max-width: 1000px; margin: 0 auto; }
-        .section { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); margin-bottom: 30px; }
-        .section-title { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 20px; }
-        .add-habit-form { display: flex; gap: 12px; }
-        .add-habit-form input { flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; }
-        .add-habit-form input:focus { outline: none; border-color: #667eea; }
-        .btn-add { padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3); }
-        .habits-list { display: flex; flex-direction: column; gap: 12px; }
-        .habit-item { background: #f8f9fa; padding: 16px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .habit-item:hover { background: #f0f1f3; transform: translateX(4px); }
-        .habit-info { flex: 1; }
-        .habit-name { font-weight: 600; color: #333; font-size: 14px; margin-bottom: 6px; }
-        .habit-stats { font-size: 12px; color: #999; display: flex; gap: 16px; }
-        .habit-actions { display: flex; gap: 8px; }
-        .btn-small { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; }
-        .btn-log { background: #e8f5e9; color: #2e7d32; }
-        .btn-log:hover { background: #c8e6c9; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 40px; border-radius: 16px; max-width: 400px; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
-        .modal-content h2 { font-size: 28px; color: #333; margin-bottom: 20px; }
-        .modal-input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; margin: 16px 0; text-align: center; }
-        .time-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px 0; }
-        .time-btn { padding: 10px; border: 2px solid #e0e0e0; background: white; border-radius: 6px; cursor: pointer; font-weight: 600; }
-        .time-btn:hover { border-color: #667eea; background: #f5f7ff; }
-        .time-btn.active { background: #667eea; color: white; border-color: #667eea; }
-        .modal-actions { margin-top: 24px; display: flex; gap: 12px; }
-        .modal-actions button { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        .modal-close { background: #f0f0f0; color: #333; }
-        .modal-close:hover { background: #e0e0e0; }
-        .toast { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; padding: 16px 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); z-index: 2000; }
-        .toast.success { background: #2e7d32; }
-        .toast.error { background: #c33; }
-        .empty-state { text-align: center; padding: 40px 20px; color: #999; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h1 { color: #333; }
+        .habits { margin-top: 20px; }
+        .habit-item { background: #f9f9f9; padding: 10px; margin: 10px 0; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+        button { padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #764ba2; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; padding: 30px; border-radius: 8px; min-width: 300px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; }
     </style>
 </head>
 <body>
-    <div id="authScreen" class="container">
-        <div class="auth-container">
-            <h1>🎯 Habit Tracker</h1>
-            <p>Build better habits, one day at a time</p>
-            <div id="errorMessage" class="error-message"></div>
-            <div id="loginForm">
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="loginEmail" placeholder="your@email.com">
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="loginPassword" placeholder="••••••••">
-                </div>
-                <button class="btn btn-primary" onclick="login()">Sign In</button>
-                <button class="btn btn-secondary" onclick="showRegister()">Create Account</button>
-                <button class="btn btn-secondary" onclick="guestMode()">Continue as Guest</button>
-            </div>
-            <div id="registerForm" style="display: none;">
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="registerEmail" placeholder="your@email.com">
-                </div>
-                <div class="form-group">
-                    <label>Display Name</label>
-                    <input type="text" id="registerName" placeholder="Your Name">
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="registerPassword" placeholder="••••••••">
-                </div>
-                <div class="form-group">
-                    <label>Confirm Password</label>
-                    <input type="password" id="registerConfirm" placeholder="••••••••">
-                </div>
-                <button class="btn btn-primary" onclick="register()">Create Account</button>
-                <button class="btn btn-secondary" onclick="showLogin()">Back to Sign In</button>
-            </div>
-        </div>
+    <div class="container">
+        <h1>Habit Tracker v3.0.10</h1>
+        <button onclick="addHabitUI()">Add Habit</button>
+        <div class="habits" id="habitsList"></div>
     </div>
 
-    <div id="appScreen" class="app-container">
-        <div class="header">
-            <h1>🎯 Habit Tracker</h1>
-            <div class="user-section">
-                <div style="text-align: right;">
-                    <div style="font-weight: 600; color: #333; font-size: 14px;" id="userName">User</div>
-                    <div style="font-size: 12px; color: #999;" id="userEmail">guest@local</div>
-                </div>
-                <div class="avatar" id="userAvatar">U</div>
-                <button class="btn-logout" onclick="logout()">Logout</button>
-            </div>
-        </div>
-
-        <div class="content">
-            <div class="section">
-                <div class="section-title">➕ Add New Habit</div>
-                <div class="add-habit-form">
-                    <input type="text" id="habitInput" placeholder="e.g., Running, Reading, Meditation..." maxlength="50">
-                    <button class="btn-add" onclick="addHabit()">Add</button>
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="section-title">📋 Active Habits</div>
-                <div class="habits-list" id="habitsList">
-                    <div class="empty-state">
-                        <p>No habits yet. Start by adding one!</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="logHabitModal" class="modal">
+    <div class="modal" id="logModal">
         <div class="modal-content">
             <h2>Log Habit</h2>
-            <p id="logHabitName" style="font-size: 16px; color: #667eea; font-weight: 600; margin-bottom: 20px;"></p>
-            <div style="text-align: left;">
-                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">How many minutes?</label>
-                <div class="time-buttons">
-                    <button class="time-btn" onclick="selectTime(15)">15 min</button>
-                    <button class="time-btn" onclick="selectTime(30)">30 min</button>
-                    <button class="time-btn" onclick="selectTime(45)">45 min</button>
-                    <button class="time-btn" onclick="selectTime(60)">60 min</button>
-                </div>
-                <input type="number" id="customTime" class="modal-input" placeholder="or enter custom minutes" min="1" oninput="updatePointsPreview()">
-                <p id="pointsPreview" style="font-size: 13px; color: #667eea; font-weight: 600; margin-top: 8px; text-align: center;"></p>
-            </div>
-            <div class="modal-actions">
-                <button class="modal-close" onclick="closeLogModal()">Cancel</button>
-                <button style="background: #667eea; color: white;" onclick="confirmLogHabit()">Log</button>
-            </div>
+            <p id="habitName"></p>
+            <input type="number" id="minutes" placeholder="Minutes" value="30">
+            <button onclick="logHabit()">Log</button>
+            <button onclick="closeModal()">Cancel</button>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const SUPABASE_URL = 'https://kpvifxpxatosmaumldry.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwdmlmeHB4YXRvc21hdW1sZHJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0NDcyODEsImV4cCI6MjEwNTAyMzI4MX0.LCrNpv1dR10KRO7WBh-nfhkdp-nO0cYaAUeiKXpjTWQ';
+        let habits = [
+            { id: 1, name: 'TV', points: 0 },
+            { id: 2, name: 'Gaming', points: 0 },
+            { id: 3, name: 'Running', points: 0 }
+        ];
+        let selectedHabitId = null;
 
-        let sbClient = null;
-        let currentUser = null;
-        let habits = [];
-        let isGuest = false;
-        let logModalHabitId = null;
-        let selectedTime = null;
-
-        function initSupabase() {
-            if (window.supabase && !sbClient) {
-                sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            }
-            return sbClient;
-        }
-
-        async function login() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            if (!email || !password) { showError('Please fill in all fields'); return; }
-            try {
-                const sb = initSupabase();
-                if (!sb) { showError('Supabase not available'); return; }
-                const { data, error } = await sb.auth.signInWithPassword({ email, password });
-                if (error) { showError(error.message); return; }
-                currentUser = data.user;
-                document.getElementById('userName').textContent = email.split('@')[0];
-                document.getElementById('userEmail').textContent = email;
-                document.getElementById('userAvatar').textContent = email[0].toUpperCase();
-                document.getElementById('loginEmail').value = '';
-                document.getElementById('loginPassword').value = '';
-                await loadHabits();
-                showApp();
-                showToast('Welcome back!', 'success');
-            } catch (err) {
-                showError('Login failed: ' + err.message);
-            }
-        }
-
-        async function register() {
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            const confirm = document.getElementById('registerConfirm').value;
-            const name = document.getElementById('registerName').value;
-            if (!email || !password || !confirm || !name) { showError('Fill all fields'); return; }
-            if (password !== confirm) { showError('Passwords dont match'); return; }
-            try {
-                const sb = initSupabase();
-                const { data, error } = await sb.auth.signUp({ email, password, options: { data: { display_name: name } } });
-                if (error) { showError(error.message); return; }
-                currentUser = data.user;
-                document.getElementById('userName').textContent = name;
-                document.getElementById('userEmail').textContent = email;
-                document.getElementById('userAvatar').textContent = name[0].toUpperCase();
-                showApp();
-                showToast('Account created!', 'success');
-            } catch (err) {
-                showError('Registration failed');
-            }
-        }
-
-        function guestMode() {
-            isGuest = true;
-            currentUser = { id: 'guest', email: 'guest@local' };
-            document.getElementById('userName').textContent = 'Guest';
-            document.getElementById('userEmail').textContent = 'Local only';
-            document.getElementById('userAvatar').textContent = 'G';
-            const stored = localStorage.getItem('habits_guest');
-            habits = stored ? JSON.parse(stored) : [];
-            showApp();
-            showToast('Guest mode', 'success');
-        }
-
-        async function logout() {
-            try {
-                if (!isGuest) {
-                    const sb = initSupabase();
-                    if (sb) await sb.auth.signOut();
-                }
-                currentUser = null;
-                habits = [];
-                isGuest = false;
-                showAuth();
-                showToast('Logged out', 'success');
-            } catch (err) {
-                currentUser = null;
-                showAuth();
-            }
-        }
-
-        async function loadHabits() {
-            if (isGuest) { const stored = localStorage.getItem('habits_guest'); habits = stored ? JSON.parse(stored) : []; return; }
-            try {
-                const sb = initSupabase();
-                if (!sb || !currentUser) return;
-                const { data, error } = await sb.from('habits').select('*').eq('user_id', currentUser.id);
-                if (error) throw error;
-                habits = data || [];
-            } catch (err) {
-                console.error('Load error:', err);
-            }
-        }
-
-        async function saveHabits() {
-            if (isGuest) { localStorage.setItem('habits_guest', JSON.stringify(habits)); return; }
-            try {
-                const sb = initSupabase();
-                if (!sb || !currentUser) return;
-                for (let habit of habits) {
-                    if (!habit.id || habit.id > Date.now() - 86400000) {
-                        const { data, error } = await sb.from('habits').insert([{ user_id: currentUser.id, name: habit.name, streak: habit.streak, last_logged_date: habit.lastLoggedDate, total_points: habit.totalPoints, is_deleted: habit.isDeleted }]).select();
-                        if (data && data[0]) habit.id = data[0].id;
-                    } else {
-                        await sb.from('habits').update({ name: habit.name, streak: habit.streak, last_logged_date: habit.lastLoggedDate, total_points: habit.totalPoints }).eq('id', habit.id).eq('user_id', currentUser.id);
-                    }
-                }
-            } catch (err) {
-                console.error('Save error:', err);
-            }
-        }
-
-        async function addHabit() {
-            const input = document.getElementById('habitInput');
-            const name = input.value.trim();
-            if (!name) { showError('Enter habit name'); return; }
-            const newHabit = { id: Date.now(), name, streak: 0, lastLoggedDate: null, totalPoints: 0, timeSpentToday: 0, isDeleted: false };
-            habits.push(newHabit);
-            await saveHabits();
-            showToast('Habit added!', 'success');
-            input.value = '';
-            renderHabits();
-        }
-
-        function renderHabits() {
+        function render() {
             const list = document.getElementById('habitsList');
-            const active = habits.filter(h => !h.isDeleted);
-            if (active.length === 0) { list.innerHTML = '<div class="empty-state"><p>No habits yet</p></div>'; return; }
-            list.innerHTML = active.map(h => `
+            list.innerHTML = habits.map(h => `
                 <div class="habit-item">
-                    <div class="habit-info">
-                        <div class="habit-name">${h.name}</div>
-                        <div class="habit-stats"><span>Streak: ${h.streak || 0} days</span><span>Points: ${h.totalPoints || 0}</span></div>
+                    <div>
+                        <strong>${h.name}</strong>
+                        <br>
+                        <small>Points: ${h.points}</small>
                     </div>
-                    <div class="habit-actions">
-                        <button class="btn-small btn-log" onclick="openLogModal(${h.id})">Log</button>
-                    </div>
+                    <button onclick="openLogModal(${h.id})">Log</button>
                 </div>
             `).join('');
         }
 
         function openLogModal(habitId) {
+            selectedHabitId = habitId;
             const habit = habits.find(h => h.id === habitId);
-            if (!habit) return;
-            logModalHabitId = habitId;
-            selectedTime = null;
-            document.getElementById('logHabitName').textContent = habit.name;
-            document.getElementById('customTime').value = '';
-            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('logHabitModal').style.display = 'flex';
+            document.getElementById('habitName').textContent = `Log: ${habit.name}`;
+            document.getElementById('minutes').value = '30';
+            document.getElementById('logModal').classList.add('active');
         }
 
-        function selectTime(minutes) {
-            selectedTime = minutes;
-            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById('customTime').value = '';
-            updatePointsPreview();
+        function closeModal() {
+            document.getElementById('logModal').classList.remove('active');
+            selectedHabitId = null;
         }
 
-        function updatePointsPreview() {
-            const customTime = parseInt(document.getElementById('customTime').value);
-            if (customTime && !isNaN(customTime)) {
-                selectedTime = null;
-                document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
-            }
-            const minutes = customTime || selectedTime;
-            const preview = document.getElementById('pointsPreview');
-            if (!minutes) { preview.textContent = ''; return; }
-            const points = Math.floor(minutes / 15);
-            preview.textContent = `${minutes} min = ${points} point${points !== 1 ? 's' : ''}`;
-        }
-
-        function confirmLogHabit() {
-            const customTime = parseInt(document.getElementById('customTime').value);
-            const minutes = customTime || selectedTime;
-            if (!minutes) { showError('Select time'); return; }
-            if (minutes < 1) { showError('Min 1 minute'); return; }
-            logHabit(logModalHabitId, minutes);
-            closeLogModal();
-        }
-
-        function closeLogModal() {
-            document.getElementById('logHabitModal').style.display = 'none';
-            logModalHabitId = null;
-            selectedTime = null;
-        }
-
-        async function logHabit(habitId, minutes) {
-            const habit = habits.find(h => h.id === habitId);
-            if (!habit) return;
-            const today = new Date().toISOString().split('T')[0];
-            const points = Math.floor(minutes / 15);
-            habit.totalPoints = (habit.totalPoints || 0) + points;
-            habit.lastLoggedDate = today;
-            await saveHabits();
-            renderHabits();
-            showToast(`Logged ${minutes} mins = ${points} points!`, 'success');
-        }
-
-        function showAuth() { document.getElementById('authScreen').style.display = 'flex'; document.getElementById('appScreen').style.display = 'none'; }
-        function showApp() { document.getElementById('authScreen').style.display = 'none'; document.getElementById('appScreen').style.display = 'block'; renderHabits(); }
-        function showError(message) { const err = document.getElementById('errorMessage'); err.textContent = message; err.style.display = 'block'; setTimeout(() => { err.style.display = 'none'; }, 5000); }
-        function showToast(msg, type = 'success') { const t = document.createElement('div'); t.className = `toast ${type}`; t.textContent = msg; document.body.appendChild(t); setTimeout(() => { t.remove(); }, 3000); }
-        function showLogin() { document.getElementById('loginForm').style.display = 'block'; document.getElementById('registerForm').style.display = 'none'; }
-        function showRegister() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'block'; }
-
-        document.addEventListener('DOMContentLoaded', async function() {
-            try {
-                const sb = initSupabase();
-                if (sb) {
-                    const { data: { user } } = await sb.auth.getUser();
-                    if (user) {
-                        currentUser = user;
-                        document.getElementById('userName').textContent = user.email?.split('@')[0] || 'User';
-                        document.getElementById('userEmail').textContent = user.email || '';
-                        document.getElementById('userAvatar').textContent = (user.email || 'U')[0].toUpperCase();
-                        await loadHabits();
-                        showApp();
-                        return;
-                    }
+        function logHabit() {
+            const minutes = parseInt(document.getElementById('minutes').value);
+            if (minutes && selectedHabitId) {
+                const habit = habits.find(h => h.id === selectedHabitId);
+                if (habit) {
+                    habit.points += Math.floor(minutes / 15);
+                    render();
+                    closeModal();
+                    alert('Logged: ' + minutes + ' minutes!');
                 }
-            } catch (err) { console.error('Init error:', err); }
-            showAuth();
-        });
+            }
+        }
+
+        function addHabitUI() {
+            const name = prompt('Habit name:');
+            if (name) {
+                habits.push({ id: Date.now(), name: name, points: 0 });
+                render();
+            }
+        }
+
+        render();
     </script>
 </body>
 </html>
