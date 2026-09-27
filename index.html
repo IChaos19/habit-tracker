@@ -854,7 +854,7 @@
 
             // Show reset button only for specific email
             const resetBtn = document.getElementById('resetBtn');
-            if (currentUser.email === 'Itay.aharon19@gmail.com') {
+            if (currentUser.email && currentUser.email.toLowerCase() === 'itay.aharon19@gmail.com') {
                 resetBtn.style.display = 'block';
             } else {
                 resetBtn.style.display = 'none';
