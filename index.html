@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Habit Tracker v3.1.1 Debug</title>
+    <title>Habit Tracker v3.1.2 Fixed</title>
     <style>
         body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
         .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
@@ -275,7 +275,7 @@
             }
             const html = active.map(h => {
                 log('Habit: id=' + h.id + ' name=' + h.name + ' points=' + h.totalPoints);
-                return '<div class="habit-item"><div><strong>' + h.name + '</strong><br><small>Streak: ' + h.streak + ' days | Points: ' + h.totalPoints + '</small></div><button type="button" onclick="openLogModal(\'' + h.id + '\')">Log</button></div>';'</small></div><button type="button" onclick="openLogModal(' + h.id + ')">Log</button></div>';
+                return '<div class="habit-item"><div><strong>' + h.name + '</strong><br><small>Streak: ' + h.streak + ' days | Points: ' + h.totalPoints + '</small></div><button type="button" onclick="openLogModal(\'' + h.id + '\')">Log</button></div>';
             }).join('');
             list.innerHTML = html;
         }
