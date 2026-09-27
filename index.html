@@ -1044,25 +1044,38 @@
                 if (!sb || !currentUser) return;
 
                 for (let habit of habits) {
-                    if (habit.id === Date.now() || typeof habit.id === 'number') {
-                        // New habit - insert
-                        const { error } = await sb.from('habits').insert([{
+                    if (!habit.id || habit.id > Date.now() - 86400000) {
+                        // New habit (ID is temp timestamp from today) - insert
+                        const { data, error } = await sb.from('habits').insert([{
                             user_id: currentUser.id,
                             name: habit.name,
                             streak: habit.streak,
-                            lastLoggedDate: habit.lastLoggedDate,
-                            totalPoints: habit.totalPoints,
-                            timeSpentToday: habit.timeSpentToday,
-                            isDeleted: habit.isDeleted,
-                            isCompleted: habit.isCompleted,
-                            completedAt: habit.completedAt
-                        }]);
-                        if (error) console.error('Insert habit error:', error);
+                            last_logged_date: habit.lastLoggedDate,
+                            total_points: habit.totalPoints,
+                            is_deleted: habit.isDeleted,
+                            is_completed: habit.isCompleted,
+                            completed_at: habit.completedAt
+                        }]).select();
+
+                        if (error) {
+                            console.error('Insert habit error:', error);
+                        } else if (data && data[0]) {
+                            // Update local habit with real database ID
+                            habit.id = data[0].id;
+                        }
                     } else {
                         // Existing habit - update
                         const { error } = await sb
                             .from('habits')
-                            .update(habit)
+                            .update({
+                                name: habit.name,
+                                streak: habit.streak,
+                                last_logged_date: habit.lastLoggedDate,
+                                total_points: habit.totalPoints,
+                                is_deleted: habit.isDeleted,
+                                is_completed: habit.isCompleted,
+                                completed_at: habit.completedAt
+                            })
                             .eq('id', habit.id)
                             .eq('user_id', currentUser.id);
                         if (error) console.error('Update habit error:', error);
