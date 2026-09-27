@@ -589,6 +589,7 @@
                     streak: h.streak || 0,
                     lastLoggedDate: h.last_logged_date,
                     totalPoints: h.total_points || 0,
+                    minutesLogged: h.minutes_logged || 0,
                     isDeleted: h.is_deleted || false
                 }));
             } catch (err) {
@@ -610,6 +611,7 @@
                         streak: h.streak || 0,
                         last_logged_date: h.lastLoggedDate,
                         total_points: h.totalPoints || 0,
+                        minutes_logged: h.minutesLogged || 0,
                         is_deleted: h.isDeleted || false
                     };
                     if (!h.id || h.id > Date.now() - 86400000) {
@@ -640,6 +642,7 @@
                 streak: 0,
                 lastLoggedDate: null,
                 totalPoints: 0,
+                minutesLogged: 0,
                 isDeleted: false
             });
             input.value = '';
@@ -664,6 +667,7 @@
                         <div class="habit-stats">
                             <div class="habit-stat">🔥 Streak: ${h.streak} days</div>
                             <div class="habit-stat">⭐ Points: ${h.totalPoints}</div>
+                            <div class="habit-stat">⏱️ Time: ${h.minutesLogged} mins</div>
                         </div>
                     </div>
                     <div class="habit-actions">
@@ -754,7 +758,11 @@
             const h = habits.find(x => x.id == selectedHabitId);
             if (!h) return;
 
-            h.totalPoints += Math.floor(mins / 15);
+            // Add minutes to total and recalculate points
+            if (!h.minutesLogged) h.minutesLogged = 0;
+            h.minutesLogged += mins;
+            h.totalPoints = Math.floor(h.minutesLogged / 15);
+
             h.lastLoggedDate = new Date().toISOString().split('T')[0];
             h.streak = Math.max(1, h.streak);
 
@@ -762,7 +770,7 @@
             renderHabits();
             updateStats();
             closeModal();
-            alert('Logged ' + mins + ' minutes!');
+            alert('Logged ' + mins + ' minutes! Total: ' + h.minutesLogged + ' mins (' + h.totalPoints + ' points)');
         }
 
         function completeHabit(habitId) {
