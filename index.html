@@ -275,7 +275,7 @@
             }
             const html = active.map(h => {
                 log('Habit: id=' + h.id + ' name=' + h.name + ' points=' + h.totalPoints);
-                return '<div class="habit-item"><div><strong>' + h.name + '</strong><br><small>Streak: ' + h.streak + ' days | Points: ' + h.totalPoints + '</small></div><button type="button" onclick="openLogModal(' + h.id + ')">Log</button></div>';
+                return '<div class="habit-item"><div><strong>' + h.name + '</strong><br><small>Streak: ' + h.streak + ' days | Points: ' + h.totalPoints + '</small></div><button type="button" onclick="openLogModal(\'' + h.id + '\')">Log</button></div>';'</small></div><button type="button" onclick="openLogModal(' + h.id + ')">Log</button></div>';
             }).join('');
             list.innerHTML = html;
         }
