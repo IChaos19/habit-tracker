@@ -3,47 +3,331 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Habit Tracker v3.1.3</title>
+    <title>Habit Tracker v3.1.4</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        h1 { color: #333; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .user-info { font-size: 12px; color: #666; }
-        .btn-logout { padding: 8px 16px; background: #ff6b6b; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #E8DEEF 0%, #F0E6FA 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .main-container { display: flex; gap: 20px; max-width: 1400px; margin: 0 auto; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+        .sidebar h3 { color: #333; margin-bottom: 20px; font-size: 18px; }
+        .progress-bar {
+            background: #E8E8E8;
+            height: 200px;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .progress-fill {
+            background: linear-gradient(180deg, #7B68EE 0%, #9B88EE 100%);
+            height: 100%;
+            border-radius: 20px;
+            transition: height 0.3s ease;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            padding-bottom: 10px;
+        }
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #999;
+            padding: 0 10px;
+            margin-bottom: 20px;
+        }
+        .stats { font-size: 13px; color: #666; line-height: 1.8; }
+        .stats div { margin: 8px 0; }
+        .stat-label { color: #999; }
+        .stat-value { font-weight: bold; color: #333; }
+
+        /* HEADER */
+        .header {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .logo { font-size: 32px; }
+        .header-title { font-size: 24px; font-weight: bold; color: #333; }
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        .user-profile {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #7B68EE;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .user-info { font-size: 13px; color: #666; }
+        .btn-logout { padding: 8px 16px; background: #ff6b6b; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; }
         .btn-logout:hover { background: #ff5252; }
-        .auth-screen { display: none; }
-        .app-screen { display: none; }
-        .habits { margin-top: 20px; }
-        .habit-item { background: #f9f9f9; padding: 10px; margin: 10px 0; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
-        button { padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background: #764ba2; }
-        button.secondary { background: #f5f5f5; color: #333; }
-        button.secondary:hover { background: #e8e8e8; }
-        button.logout { background: #ff6b6b; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+
+        /* MAIN CONTENT */
+        .content { flex: 1; }
+
+        /* ADD HABIT SECTION */
+        .add-habit-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .add-habit-section h2 { color: #333; margin-bottom: 15px; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+        .add-habit-form { display: flex; gap: 10px; }
+        .add-habit-form input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .add-habit-form input:focus { outline: none; border-color: #7B68EE; }
+        .btn-add {
+            padding: 12px 30px;
+            background: #7B68EE;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-add:hover { background: #6A5ADB; }
+
+        /* HABITS SECTION */
+        .habits-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .habits-section h2 { color: #333; margin-bottom: 15px; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+        .habit-card {
+            background: #F9F7FF;
+            padding: 15px;
+            margin: 12px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .habit-info { flex: 1; }
+        .habit-name { font-size: 16px; font-weight: bold; color: #333; margin-bottom: 8px; }
+        .habit-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+        .habit-stat { display: flex; align-items: center; gap: 5px; }
+        .habit-actions { display: flex; gap: 10px; }
+        .habit-actions button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .btn-log { background: #51cf66; color: white; }
+        .btn-log:hover { background: #40C057; }
+        .btn-done { background: #FFA500; color: white; }
+        .btn-done:hover { background: #FF8C00; }
+        .btn-delete { background: #ff6b6b; color: white; }
+        .btn-delete:hover { background: #ff5252; }
+
+        /* HISTORY SECTION */
+        .history-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .history-section h2 { color: #333; margin-bottom: 15px; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .history-table th {
+            background: #F5F0FF;
+            padding: 12px;
+            text-align: left;
+            color: #666;
+            font-weight: bold;
+            border-bottom: 1px solid #E8E8E8;
+        }
+        .history-table td {
+            padding: 12px;
+            border-bottom: 1px solid #E8E8E8;
+            color: #555;
+        }
+        .history-table tr:hover { background: #F9F7FF; }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
         .modal.active { display: flex; }
-        .modal-content { background: white; padding: 30px; border-radius: 8px; min-width: 300px; }
-        .modal-content h2 { margin-top: 0; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            min-width: 400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .modal-content h2 { color: #333; margin-bottom: 10px; }
+        .modal-content p { color: #666; margin-bottom: 20px; font-size: 14px; }
+        .time-presets {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .time-btn {
+            padding: 12px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #666;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .time-btn:hover { border-color: #7B68EE; background: #F5F0FF; }
+        .time-btn.active { background: #7B68EE; color: white; border-color: #7B68EE; }
+        .time-btn::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            margin-bottom: 8px;
+            transition: opacity 0.2s;
+        }
+        .time-btn:hover::after { opacity: 1; }
+        .custom-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .btn-modal {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-submit { background: #7B68EE; color: white; }
+        .btn-submit:hover { background: #6A5ADB; }
+        .btn-cancel { background: #E8E8E8; color: #333; }
+        .btn-cancel:hover { background: #D8D8D8; }
+
+        /* AUTH SCREENS */
+        .auth-screen { display: none; }
+        .auth-container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            max-width: 400px;
+            margin: 50px auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .auth-container h1 { color: #333; margin-bottom: 10px; }
+        .auth-container p { color: #666; margin-bottom: 25px; }
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        .form-group input:focus { outline: none; border-color: #7B68EE; }
         .error { color: #ff6b6b; font-size: 12px; margin: 10px 0; }
-        .success { color: #51cf66; font-size: 12px; margin: 10px 0; }
-        .empty-state { text-align: center; padding: 20px; color: #999; }
-        .btn-add { width: 100%; }
+        .auth-button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background: #7B68EE;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .auth-button:hover { background: #6A5ADB; }
+        .auth-button.secondary {
+            background: #F5F5F5;
+            color: #333;
+        }
+        .auth-button.secondary:hover { background: #E8E8E8; }
     </style>
 </head>
 <body>
     <!-- AUTH SCREEN -->
-    <div id="authScreen" class="auth-screen">
-        <div class="container">
+    <div class="auth-screen" id="authScreen">
+        <div class="auth-container">
             <h1>🎯 Habit Tracker</h1>
             <p>Build better habits, one day at a time</p>
+            <div class="error" id="authError"></div>
 
-            <div id="authError" class="error"></div>
-
-            <!-- Login Form -->
             <div id="loginForm">
                 <div class="form-group">
                     <label>Email</label>
@@ -53,12 +337,11 @@
                     <label>Password</label>
                     <input type="password" id="loginPassword" placeholder="••••••••">
                 </div>
-                <button onclick="login()">Sign In</button>
-                <button class="secondary" onclick="toggleRegister()">Create Account</button>
-                <button class="secondary" onclick="guestMode()">Continue as Guest</button>
+                <button class="auth-button" onclick="login()">Sign In</button>
+                <button class="auth-button secondary" onclick="toggleRegister()">Create Account</button>
+                <button class="auth-button secondary" onclick="guestMode()">Continue as Guest</button>
             </div>
 
-            <!-- Register Form -->
             <div id="registerForm" style="display: none;">
                 <div class="form-group">
                     <label>Email</label>
@@ -76,39 +359,105 @@
                     <label>Confirm Password</label>
                     <input type="password" id="registerConfirm" placeholder="••••••••">
                 </div>
-                <button onclick="register()">Create Account</button>
-                <button class="secondary" onclick="toggleRegister()">Back to Sign In</button>
+                <button class="auth-button" onclick="register()">Create Account</button>
+                <button class="auth-button secondary" onclick="toggleRegister()">Back to Sign In</button>
             </div>
         </div>
     </div>
 
     <!-- APP SCREEN -->
-    <div id="appScreen" class="app-screen">
-        <div class="container">
-            <div class="header">
-                <h1>🎯 Habit Tracker</h1>
-                <div>
-                    <div class="user-info" id="userEmail"></div>
-                    <button class="logout btn-logout" onclick="logout()">Logout</button>
+    <div class="app-screen" id="appScreen" style="display: none;">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-left">
+                <div class="logo">🎯</div>
+                <div class="header-title">Habit Tracker</div>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div id="userEmail"></div>
+                </div>
+                <div class="user-profile" id="userProfile">I</div>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <!-- SIDEBAR -->
+            <div class="sidebar">
+                <h3>Your Progress</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-labels">
+                    <span>0</span>
+                    <span>50</span>
+                    <span>100+</span>
+                </div>
+                <div class="stats">
+                    <div><span class="stat-label">Total Points:</span> <span class="stat-value" id="totalPoints">0</span></div>
+                    <div><span class="stat-label">Active Habits:</span> <span class="stat-value" id="activeHabits">0</span></div>
+                    <div><span class="stat-label">This Month:</span> <span class="stat-value" id="thisMonth">0</span></div>
                 </div>
             </div>
 
-            <button class="btn-add" onclick="addHabitUI()">Add New Habit</button>
+            <!-- MAIN CONTENT -->
+            <div class="content">
+                <!-- ADD HABIT -->
+                <div class="add-habit-section">
+                    <h2>➕ Add New Habit</h2>
+                    <div class="add-habit-form">
+                        <input type="text" id="habitInput" placeholder="e.g., Running, Reading, Meditation...">
+                        <button class="btn-add" onclick="addHabit()">Add</button>
+                    </div>
+                </div>
 
-            <div class="habits" id="habitsList">
-                <div class="empty-state">No habits yet. Click "Add New Habit" to get started!</div>
+                <!-- ACTIVE HABITS -->
+                <div class="habits-section">
+                    <h2>📋 Active Habits</h2>
+                    <div id="habitsList"></div>
+                </div>
+
+                <!-- HISTORY -->
+                <div class="history-section">
+                    <h2>📊 History</h2>
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Habit</th>
+                                <th>Streak</th>
+                                <th>Total Points</th>
+                                <th>Last Logged</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTable">
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- LOG HABIT MODAL -->
-    <div id="logModal" class="modal">
+    <!-- LOG MODAL -->
+    <div class="modal" id="logModal">
         <div class="modal-content">
             <h2>Log Habit</h2>
-            <p id="habitName"></p>
-            <input type="number" id="minutes" placeholder="Minutes" value="30" min="1">
-            <button onclick="logHabit()">Log</button>
-            <button class="secondary" onclick="closeModal()">Cancel</button>
+            <p id="modalHabitName"></p>
+            <div class="time-presets">
+                <button class="time-btn" data-minutes="15" data-tooltip="15 minutes" onclick="selectTime(15)">15m</button>
+                <button class="time-btn" data-minutes="30" data-tooltip="30 minutes" onclick="selectTime(30)">30m</button>
+                <button class="time-btn" data-minutes="45" data-tooltip="45 minutes" onclick="selectTime(45)">45m</button>
+                <button class="time-btn" data-minutes="60" data-tooltip="1 hour" onclick="selectTime(60)">1h</button>
+                <button class="time-btn" data-minutes="90" data-tooltip="1.5 hours" onclick="selectTime(90)">1.5h</button>
+                <button class="time-btn" data-minutes="120" data-tooltip="2 hours" onclick="selectTime(120)">2h</button>
+                <button class="time-btn" data-minutes="150" data-tooltip="2.5 hours" onclick="selectTime(150)">2.5h</button>
+                <button class="time-btn" data-minutes="180" data-tooltip="3 hours" onclick="selectTime(180)">3h</button>
+            </div>
+            <input type="number" class="custom-input" id="customMinutes" placeholder="Or enter custom minutes" min="1">
+            <div class="modal-buttons">
+                <button class="btn-modal btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-modal btn-submit" onclick="logHabit()">Log</button>
+            </div>
         </div>
     </div>
 
@@ -124,6 +473,7 @@
         let habits = [];
         let isGuest = false;
         let selectedHabitId = null;
+        let selectedMinutes = null;
 
         function initSupabase() {
             if (window.supabase && !sbClient) {
@@ -276,70 +626,146 @@
             }
         }
 
-        function addHabitUI() {
-            const name = prompt('Habit name:');
-            if (name && name.trim()) {
-                habits.push({
-                    id: Date.now(),
-                    name: name.trim(),
-                    streak: 0,
-                    lastLoggedDate: null,
-                    totalPoints: 0,
-                    isDeleted: false
-                });
-                saveHabits();
-                renderHabits();
+        function addHabit() {
+            const input = document.getElementById('habitInput');
+            const name = input.value.trim();
+            if (!name) {
+                showError('Please enter a habit name');
+                return;
             }
+            habits.push({
+                id: Date.now(),
+                name: name,
+                streak: 0,
+                lastLoggedDate: null,
+                totalPoints: 0,
+                isDeleted: false
+            });
+            input.value = '';
+            saveHabits();
+            renderHabits();
+            updateStats();
         }
 
         function renderHabits() {
             const list = document.getElementById('habitsList');
             const active = habits.filter(h => !h.isDeleted);
+
             if (active.length === 0) {
-                list.innerHTML = '<div class="empty-state">No habits yet. Click "Add New Habit" to get started!</div>';
+                list.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">No habits yet. Add one to get started!</p>';
                 return;
             }
+
             list.innerHTML = active.map(h => `
-                <div class="habit-item">
-                    <div>
-                        <strong>${h.name}</strong>
-                        <br>
-                        <small>Streak: ${h.streak} days | Points: ${h.totalPoints}</small>
+                <div class="habit-card">
+                    <div class="habit-info">
+                        <div class="habit-name">${h.name}</div>
+                        <div class="habit-stats">
+                            <div class="habit-stat">🔥 Streak: ${h.streak} days</div>
+                            <div class="habit-stat">⭐ Points: ${h.totalPoints}</div>
+                        </div>
                     </div>
-                    <button onclick="openLogModal('${h.id}')">Log</button>
+                    <div class="habit-actions">
+                        <button class="habit-actions button btn-log" onclick="openLogModal('${h.id}')">Log Habit</button>
+                        <button class="habit-actions button btn-done" onclick="completeHabit('${h.id}')">Done</button>
+                        <button class="habit-actions button btn-delete" onclick="deleteHabit('${h.id}')">Delete</button>
+                    </div>
                 </div>
+            `).join('');
+
+            updateHistoryTable();
+        }
+
+        function updateHistoryTable() {
+            const tbody = document.getElementById('historyTable');
+            tbody.innerHTML = habits.filter(h => !h.isDeleted).map(h => `
+                <tr>
+                    <td>${h.name}</td>
+                    <td>${h.streak} days</td>
+                    <td>${h.totalPoints} points</td>
+                    <td>${h.lastLoggedDate || 'Never'}</td>
+                </tr>
             `).join('');
         }
 
+        function updateStats() {
+            const active = habits.filter(h => !h.isDeleted);
+            const totalPoints = active.reduce((sum, h) => sum + h.totalPoints, 0);
+            const maxPoints = 200;
+            const progress = Math.min((totalPoints / maxPoints) * 100, 100);
+
+            document.getElementById('progressFill').style.height = progress + '%';
+            document.getElementById('progressFill').textContent = Math.round(progress);
+            document.getElementById('totalPoints').textContent = totalPoints;
+            document.getElementById('activeHabits').textContent = active.length;
+            document.getElementById('thisMonth').textContent = active.filter(h => h.lastLoggedDate && new Date(h.lastLoggedDate).getMonth() === new Date().getMonth()).length;
+        }
+
         function openLogModal(habitId) {
-            const h = habits.find(x => x.id === habitId);
+            const h = habits.find(x => x.id == habitId);
             if (!h) return;
             selectedHabitId = habitId;
-            document.getElementById('habitName').textContent = 'Log: ' + h.name;
-            document.getElementById('minutes').value = '30';
+            selectedMinutes = null;
+            document.getElementById('modalHabitName').textContent = 'Log: ' + h.name;
+            document.getElementById('customMinutes').value = '';
+            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('logModal').classList.add('active');
         }
 
         function closeModal() {
             document.getElementById('logModal').classList.remove('active');
             selectedHabitId = null;
+            selectedMinutes = null;
+        }
+
+        function selectTime(minutes) {
+            selectedMinutes = minutes;
+            document.getElementById('customMinutes').value = minutes;
+            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
         }
 
         function logHabit() {
-            const mins = parseInt(document.getElementById('minutes').value);
+            let mins = selectedMinutes || parseInt(document.getElementById('customMinutes').value);
             if (!mins || mins < 1) {
-                alert('Enter valid minutes');
+                alert('Please select or enter minutes');
                 return;
             }
-            const h = habits.find(x => x.id === selectedHabitId);
+            const h = habits.find(x => x.id == selectedHabitId);
             if (!h) return;
+
             h.totalPoints += Math.floor(mins / 15);
             h.lastLoggedDate = new Date().toISOString().split('T')[0];
             h.streak = Math.max(1, h.streak);
+
             saveHabits();
             renderHabits();
+            updateStats();
             closeModal();
             alert('Logged ' + mins + ' minutes!');
+        }
+
+        function completeHabit(habitId) {
+            const h = habits.find(x => x.id == habitId);
+            if (h) {
+                h.isDeleted = true;
+                saveHabits();
+                renderHabits();
+                updateStats();
+                alert(h.name + ' marked as done!');
+            }
+        }
+
+        function deleteHabit(habitId) {
+            if (confirm('Delete this habit?')) {
+                const h = habits.find(x => x.id == habitId);
+                if (h) {
+                    h.isDeleted = true;
+                    saveHabits();
+                    renderHabits();
+                    updateStats();
+                }
+            }
         }
 
         function toggleRegister() {
@@ -356,7 +782,10 @@
             document.getElementById('authScreen').style.display = 'none';
             document.getElementById('appScreen').style.display = 'block';
             document.getElementById('userEmail').textContent = currentUser.email || 'Guest';
+            const initials = (currentUser.email || 'G')[0].toUpperCase();
+            document.getElementById('userProfile').textContent = initials;
             renderHabits();
+            updateStats();
         }
 
         document.addEventListener('DOMContentLoaded', async function() {
