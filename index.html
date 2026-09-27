@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Habit Tracker v3.1.4</title>
+    <title>Habit Tracker v3.2.0</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -89,6 +89,8 @@
         .user-info { font-size: 13px; color: #666; }
         .btn-logout { padding: 8px 16px; background: #ff6b6b; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; }
         .btn-logout:hover { background: #ff5252; }
+        .btn-reset { padding: 8px 16px; background: #ff9800; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; margin-right: 10px; }
+        .btn-reset:hover { background: #f57c00; }
 
         /* MAIN CONTENT */
         .content { flex: 1; }
@@ -378,6 +380,7 @@
                     <div id="userEmail"></div>
                 </div>
                 <div class="user-profile" id="userProfile">I</div>
+                <button class="btn-reset" id="resetBtn" onclick="resetAllData()" style="display: none;">Reset All Data</button>
                 <button class="btn-logout" onclick="logout()">Logout</button>
             </div>
         </div>
@@ -570,6 +573,42 @@
             } catch (err) {
                 currentUser = null;
                 showAuth();
+            }
+        }
+
+        async function resetAllData() {
+            const confirmReset = confirm('Are you sure you want to delete ALL your data? This cannot be undone. Click OK to confirm.');
+            if (!confirmReset) return;
+
+            const finalConfirm = confirm('This is your FINAL WARNING: All habits and history will be permanently deleted. Are you absolutely sure?');
+            if (!finalConfirm) return;
+
+            try {
+                if (isGuest) {
+                    // Clear guest data from localStorage
+                    localStorage.removeItem('habits_guest');
+                    habits = [];
+                    renderHabits();
+                    updateStats();
+                    alert('All guest data has been cleared! Start fresh now.');
+                } else {
+                    // Delete all habits from database
+                    const sb = initSupabase();
+                    if (!sb || !currentUser) return;
+
+                    const { error } = await sb.from('habits').delete().eq('user_id', currentUser.id);
+                    if (error) {
+                        alert('Error deleting data: ' + error.message);
+                        return;
+                    }
+
+                    habits = [];
+                    renderHabits();
+                    updateStats();
+                    alert('All your data has been cleared! Start fresh now.');
+                }
+            } catch (err) {
+                alert('Error resetting data: ' + err.message);
             }
         }
 
@@ -812,6 +851,15 @@
             document.getElementById('userEmail').textContent = currentUser.email || 'Guest';
             const initials = (currentUser.email || 'G')[0].toUpperCase();
             document.getElementById('userProfile').textContent = initials;
+
+            // Show reset button only for specific email
+            const resetBtn = document.getElementById('resetBtn');
+            if (currentUser.email === 'Itay.aharon19@gmail.com') {
+                resetBtn.style.display = 'block';
+            } else {
+                resetBtn.style.display = 'none';
+            }
+
             renderHabits();
             updateStats();
         }
