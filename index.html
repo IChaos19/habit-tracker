@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Habit Tracker v3.2.1</title>
+    <title>Habit Tracker v3.2.2</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -742,7 +742,24 @@
             updateStats();
         }
 
+        function checkAndResetStreaks() {
+            const today = new Date().toISOString().split('T')[0];
+            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+            habits.forEach(h => {
+                if (!h.isDeleted && h.lastLoggedDate) {
+                    // If last logged date is not today or yesterday, reset streak
+                    if (h.lastLoggedDate !== today && h.lastLoggedDate !== yesterday) {
+                        h.streak = 0;
+                    }
+                }
+            });
+        }
+
         function renderHabits() {
+            // Check and reset streaks before rendering
+            checkAndResetStreaks();
+
             const list = document.getElementById('habitsList');
             const active = habits.filter(h => !h.isDeleted);
 
@@ -854,8 +871,29 @@
             h.minutesLogged += mins;
             h.totalPoints = Math.floor(h.minutesLogged / 15);
 
-            h.lastLoggedDate = new Date().toISOString().split('T')[0];
-            h.streak = Math.max(1, h.streak);
+            // Handle streak logic
+            const today = new Date().toISOString().split('T')[0];
+            const lastLogged = h.lastLoggedDate;
+
+            if (!lastLogged) {
+                // First time logging this habit
+                h.streak = 1;
+            } else if (lastLogged === today) {
+                // Already logged today, don't change streak
+                // (streak stays the same)
+            } else {
+                // Check if logged yesterday (consecutive day)
+                const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+                if (lastLogged === yesterday) {
+                    // Consecutive day - increment streak
+                    h.streak = (h.streak || 0) + 1;
+                } else {
+                    // Skipped a day - reset streak
+                    h.streak = 1;
+                }
+            }
+
+            h.lastLoggedDate = today;
 
             saveHabits();
             renderHabits();
