@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Habit Tracker v3.2.2</title>
+    <title>Time Management Platform v4.0</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -96,231 +96,305 @@
         /* MAIN CONTENT */
         .content { flex: 1; }
 
-        /* ADD HABIT SECTION */
-        .add-habit-section {
+        /* DOMAIN SELECTOR */
+        .domain-selector {
             background: white;
-            padding: 25px;
+            padding: 15px 25px;
             border-radius: 12px;
+            display: flex;
+            gap: 10px;
             margin-bottom: 20px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        .add-habit-section h2 { color: #333; margin-bottom: 15px; font-size: 18px; display: flex; align-items: center; gap: 8px; }
-        .add-habit-form { display: flex; gap: 10px; }
-        .add-habit-form input {
+        .domain-btn {
+            padding: 10px 20px;
+            border: 2px solid #E0E0E0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+        .domain-btn:hover {
+            border-color: #7B68EE;
+            color: #7B68EE;
+        }
+        .domain-btn.active {
+            background: #7B68EE;
+            color: white;
+            border-color: #7B68EE;
+        }
+
+        /* OVERVIEW DASHBOARD */
+        .overview-dashboard {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .overview-title { font-size: 20px; font-weight: bold; color: #333; margin-bottom: 20px; }
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .domain-stat-card {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .domain-stat-card:hover { transform: translateY(-5px); }
+        .domain-stat-card .domain-icon { font-size: 32px; margin-bottom: 10px; }
+        .domain-stat-card .domain-name { font-size: 14px; color: #666; margin-bottom: 8px; }
+        .domain-stat-card .domain-minutes { font-size: 24px; font-weight: bold; color: #333; }
+        .overview-total {
+            background: linear-gradient(135deg, #7B68EE 0%, #9B88EE 100%);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .overview-total .label { font-size: 14px; opacity: 0.9; }
+        .overview-total .value { font-size: 36px; font-weight: bold; margin-top: 10px; }
+
+        /* ADD ACTIVITY SECTION */
+        .add-activity-section {
+            background: white;
+            padding: 20px 25px;
+            border-radius: 12px;
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .add-activity-section input {
             flex: 1;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
+            padding: 12px;
+            border: 2px solid #E0E0E0;
             border-radius: 6px;
             font-size: 14px;
         }
-        .add-habit-form input:focus { outline: none; border-color: #7B68EE; }
-        .btn-add {
-            padding: 12px 30px;
+        .add-activity-section input:focus {
+            outline: none;
+            border-color: #7B68EE;
+        }
+        .add-activity-section button {
+            padding: 12px 20px;
             background: #7B68EE;
             color: white;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 500;
         }
-        .btn-add:hover { background: #6A5ADB; }
+        .add-activity-section button:hover { background: #6C5CE0; }
 
-        /* HABITS SECTION */
-        .habits-section {
+        /* ACTIVITY LIST */
+        .activities-container {
             background: white;
             padding: 25px;
             border-radius: 12px;
-            margin-bottom: 20px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        .habits-section h2 { color: #333; margin-bottom: 15px; font-size: 18px; display: flex; align-items: center; gap: 8px; }
-        .habit-card {
-            background: #F9F7FF;
-            padding: 15px;
-            margin: 12px 0;
+        .activities-title { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 20px; }
+        .activity-card {
+            background: #f9f9f9;
+            padding: 18px;
             border-radius: 8px;
+            margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: all 0.3s ease;
+            border-left: 4px solid #7B68EE;
+            animation: slideIn 0.3s ease;
         }
-        .habit-info { flex: 1; }
-        .habit-name { font-size: 16px; font-weight: bold; color: #333; margin-bottom: 8px; }
-        .habit-stats {
-            display: flex;
-            gap: 20px;
-            font-size: 13px;
-            color: #666;
+        .activity-card:hover { background: #f0f0f0; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
-        .habit-stat { display: flex; align-items: center; gap: 5px; }
-        .habit-actions { display: flex; gap: 10px; }
-        .habit-actions button {
-            padding: 8px 14px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-        .btn-log { background: #51cf66; color: white; }
-        .btn-log:hover { background: #40C057; }
-        .btn-done { background: #FFA500; color: white; }
-        .btn-done:hover { background: #FF8C00; }
-        .btn-delete { background: #ff6b6b; color: white; }
+        .activity-info { flex: 1; }
+        .activity-name { font-size: 16px; font-weight: bold; color: #333; margin-bottom: 8px; }
+        .activity-stats { font-size: 12px; color: #999; }
+        .activity-stats span { margin-right: 15px; }
+        .activity-actions { display: flex; gap: 10px; }
+        .btn-log { padding: 8px 12px; background: #7B68EE; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-log:hover { background: #6C5CE0; }
+        .btn-delete { padding: 8px 12px; background: #ff6b6b; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
         .btn-delete:hover { background: #ff5252; }
 
-        /* HISTORY SECTION */
-        .history-section {
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
             background: white;
-            padding: 25px;
+            padding: 15px 25px;
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        .history-section h2 { color: #333; margin-bottom: 15px; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+        .tab-btn {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            background: #7B68EE;
+            color: white;
+        }
+
+        /* HISTORY TABLE */
         .history-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         .history-table th {
-            background: #F5F0FF;
-            padding: 12px;
+            background: #7B68EE;
+            color: white;
+            padding: 15px;
             text-align: left;
-            color: #666;
-            font-weight: bold;
-            border-bottom: 1px solid #E8E8E8;
+            font-weight: 600;
         }
         .history-table td {
-            padding: 12px;
-            border-bottom: 1px solid #E8E8E8;
-            color: #555;
+            padding: 12px 15px;
+            border-bottom: 1px solid #E0E0E0;
         }
-        .history-table tr:hover { background: #F9F7FF; }
+        .history-table tr:hover { background: #f9f9f9; }
+        .history-table tbody tr:last-child td { border-bottom: none; }
+
+        /* AUTH FORMS */
+        .auth-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .auth-title { font-size: 28px; font-weight: bold; color: #333; margin-bottom: 30px; text-align: center; }
+        .auth-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #E0E0E0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .auth-input:focus {
+            outline: none;
+            border-color: #7B68EE;
+        }
+        .auth-btn {
+            width: 100%;
+            padding: 12px;
+            background: #7B68EE;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        .auth-btn:hover { background: #6C5CE0; }
+        .auth-toggle {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+        .auth-toggle button {
+            background: none;
+            border: none;
+            color: #7B68EE;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: underline;
+        }
+        .guest-btn {
+            width: 100%;
+            padding: 12px;
+            background: #95a5a6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .guest-btn:hover { background: #7f8c8d; }
 
         /* MODAL */
         .modal {
             display: none;
             position: fixed;
-            top: 0;
+            z-index: 1000;
             left: 0;
+            top: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+            background-color: rgba(0,0,0,0.5);
         }
         .modal.active { display: flex; }
         .modal-content {
-            background: white;
+            background-color: white;
+            margin: auto;
             padding: 30px;
             border-radius: 12px;
-            min-width: 400px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
         }
-        .modal-content h2 { color: #333; margin-bottom: 10px; }
-        .modal-content p { color: #666; margin-bottom: 20px; font-size: 14px; }
-        .time-presets {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .time-btn {
-            padding: 12px;
-            border: 2px solid #ddd;
-            background: white;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            color: #666;
-            transition: all 0.2s;
-            position: relative;
-        }
-        .time-btn:hover { border-color: #7B68EE; background: #F5F0FF; }
-        .time-btn.active { background: #7B68EE; color: white; border-color: #7B68EE; }
-        .time-btn::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: white;
-            padding: 5px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            margin-bottom: 8px;
-            transition: opacity 0.2s;
-        }
-        .time-btn:hover::after { opacity: 1; }
-        .custom-input {
+        .modal-title { font-size: 20px; font-weight: bold; color: #333; margin-bottom: 20px; }
+        .modal-input {
             width: 100%;
             padding: 12px;
-            border: 1px solid #ddd;
+            margin-bottom: 15px;
+            border: 2px solid #E0E0E0;
             border-radius: 6px;
-            margin-bottom: 20px;
             font-size: 14px;
         }
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
+        .modal-input:focus {
+            outline: none;
+            border-color: #7B68EE;
         }
-        .btn-modal {
-            padding: 10px 20px;
+        .modal-buttons { display: flex; gap: 10px; }
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 14px;
         }
-        .btn-submit { background: #7B68EE; color: white; }
-        .btn-submit:hover { background: #6A5ADB; }
-        .btn-cancel { background: #E8E8E8; color: #333; }
-        .btn-cancel:hover { background: #D8D8D8; }
-
-        /* AUTH SCREENS */
-        .auth-screen { display: none; }
-        .auth-container {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            max-width: 400px;
-            margin: 50px auto;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        .auth-container h1 { color: #333; margin-bottom: 10px; }
-        .auth-container p { color: #666; margin-bottom: 25px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-        }
-        .form-group input:focus { outline: none; border-color: #7B68EE; }
-        .error { color: #ff6b6b; font-size: 12px; margin: 10px 0; }
-        .auth-button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
+        .modal-btn.primary {
             background: #7B68EE;
             color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
         }
-        .auth-button:hover { background: #6A5ADB; }
-        .auth-button.secondary {
-            background: #F5F5F5;
+        .modal-btn.primary:hover { background: #6C5CE0; }
+        .modal-btn.secondary {
+            background: #E0E0E0;
             color: #333;
         }
-        .auth-button.secondary:hover { background: #E8E8E8; }
+        .modal-btn.secondary:hover { background: #D0D0D0; }
 
         /* TOAST NOTIFICATION */
         .toast {
@@ -329,15 +403,14 @@
             right: 20px;
             background: #333;
             color: white;
-            padding: 15px 20px;
+            padding: 16px 24px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            z-index: 2000;
-            animation: slideIn 0.3s ease;
-            max-width: 300px;
             font-size: 14px;
+            z-index: 2000;
+            animation: slideInToast 0.3s ease;
         }
-        @keyframes slideIn {
+        @keyframes slideInToast {
             from {
                 transform: translateX(400px);
                 opacity: 0;
@@ -347,7 +420,7 @@
                 opacity: 1;
             }
         }
-        @keyframes slideOut {
+        @keyframes slideOutToast {
             from {
                 transform: translateX(0);
                 opacity: 1;
@@ -357,620 +430,718 @@
                 opacity: 0;
             }
         }
-        .toast.out {
-            animation: slideOut 0.3s ease;
+        .toast.removing { animation: slideOutToast 0.3s ease; }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; }
+            .domain-selector { flex-wrap: wrap; }
+            .overview-grid { grid-template-columns: 1fr; }
+            .activity-card { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .activity-actions { width: 100%; }
         }
     </style>
 </head>
 <body>
-    <!-- AUTH SCREEN -->
-    <div class="auth-screen" id="authScreen">
-        <div class="auth-container">
-            <h1>🎯 Habit Tracker</h1>
-            <p>Build better habits, one day at a time</p>
-            <div class="error" id="authError"></div>
-
-            <div id="loginForm">
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="loginEmail" placeholder="your@email.com">
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="loginPassword" placeholder="••••••••">
-                </div>
-                <button class="auth-button" onclick="login()">Sign In</button>
-                <button class="auth-button secondary" onclick="toggleRegister()">Create Account</button>
-                <button class="auth-button secondary" onclick="guestMode()">Continue as Guest</button>
+    <!-- HEADER -->
+    <div class="header" id="header" style="display: none;">
+        <div class="header-left">
+            <div class="logo">⏱️</div>
+            <div class="header-title">Time Manager v4.0</div>
+        </div>
+        <div class="header-right">
+            <div>
+                <div class="user-info">Logged in as:</div>
+                <div id="userEmail" style="font-weight: bold; color: #333;"></div>
             </div>
-
-            <div id="registerForm" style="display: none;">
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="registerEmail" placeholder="your@email.com">
-                </div>
-                <div class="form-group">
-                    <label>Name</label>
-                    <input type="text" id="registerName" placeholder="Your Name">
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="registerPassword" placeholder="••••••••">
-                </div>
-                <div class="form-group">
-                    <label>Confirm Password</label>
-                    <input type="password" id="registerConfirm" placeholder="••••••••">
-                </div>
-                <button class="auth-button" onclick="register()">Create Account</button>
-                <button class="auth-button secondary" onclick="toggleRegister()">Back to Sign In</button>
-            </div>
+            <div class="user-profile" id="userAvatar"></div>
+            <button class="btn-reset" id="resetBtn" style="display: none;">Reset Data</button>
+            <button class="btn-logout" id="logoutBtn">Logout</button>
         </div>
     </div>
 
-    <!-- APP SCREEN -->
-    <div class="app-screen" id="appScreen" style="display: none;">
-        <!-- HEADER -->
-        <div class="header">
-            <div class="header-left">
-                <div class="logo">🎯</div>
-                <div class="header-title">Habit Tracker</div>
+    <!-- MAIN CONTENT -->
+    <div class="main-container" id="mainContent" style="display: none;">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <h3>📊 Progress</h3>
+            <div class="progress-labels">
+                <span>0 min</span>
+                <span id="nextMilestone">15 min</span>
             </div>
-            <div class="header-right">
-                <div class="user-info">
-                    <div id="userEmail"></div>
-                </div>
-                <div class="user-profile" id="userProfile">I</div>
-                <button class="btn-reset" id="resetBtn" onclick="resetAllData()" style="display: none;">Reset All Data</button>
-                <button class="btn-logout" onclick="logout()">Logout</button>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="stats">
+                <div><span class="stat-label">Total Points:</span><br><span class="stat-value" id="totalPoints">0</span></div>
+                <div><span class="stat-label">Active Domains:</span><br><span class="stat-value" id="activeDomains">0</span></div>
+                <div><span class="stat-label">Total Time:</span><br><span class="stat-value" id="totalTime">0 mins</span></div>
             </div>
         </div>
 
-        <div class="main-container">
-            <!-- SIDEBAR -->
-            <div class="sidebar">
-                <h3>Your Progress</h3>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-                <div class="progress-labels">
-                    <span>0</span>
-                    <span>50</span>
-                    <span>100+</span>
-                </div>
-                <div class="stats">
-                    <div><span class="stat-label">Total Points:</span> <span class="stat-value" id="totalPoints">0</span></div>
-                    <div><span class="stat-label">Active Habits:</span> <span class="stat-value" id="activeHabits">0</span></div>
-                    <div><span class="stat-label">This Month:</span> <span class="stat-value" id="thisMonth">0</span></div>
+        <!-- CONTENT -->
+        <div class="content">
+            <!-- DOMAIN SELECTOR -->
+            <div class="domain-selector" id="domainSelector"></div>
+
+            <!-- OVERVIEW DASHBOARD (shown when "All" is selected) -->
+            <div id="overviewContainer" style="display: none;">
+                <div class="overview-dashboard">
+                    <h2 class="overview-title">📊 Time Tracking Overview</h2>
+                    <div class="overview-total">
+                        <div class="label">Total Time Logged Today</div>
+                        <div class="value" id="totalTimeToday">0 mins</div>
+                    </div>
+                    <div class="overview-grid" id="domainStatsContainer"></div>
+                    <div style="text-align: center; color: #666; font-size: 14px;">
+                        <p>Click on a domain card to view details</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- MAIN CONTENT -->
-            <div class="content">
-                <!-- ADD HABIT -->
-                <div class="add-habit-section">
-                    <h2>➕ Add New Habit</h2>
-                    <div class="add-habit-form">
-                        <input type="text" id="habitInput" placeholder="e.g., Running, Reading, Meditation...">
-                        <button class="btn-add" onclick="addHabit()">Add</button>
-                    </div>
+            <!-- DOMAIN VIEW (shown for specific domains) -->
+            <div id="domainViewContainer" style="display: none;">
+                <!-- ADD ACTIVITY -->
+                <div class="add-activity-section">
+                    <input type="text" id="activityInput" placeholder="Add new activity...">
+                    <button onclick="addActivityToCurrentDomain()">Add</button>
                 </div>
 
-                <!-- ACTIVE HABITS -->
-                <div class="habits-section">
-                    <h2>📋 Active Habits</h2>
-                    <div id="habitsList"></div>
+                <!-- ACTIVITIES LIST -->
+                <div class="activities-container">
+                    <h2 class="activities-title" id="domainTitle"></h2>
+                    <div id="activitiesList"></div>
                 </div>
+            </div>
 
-                <!-- HISTORY -->
-                <div class="history-section">
-                    <h2>📊 History</h2>
+            <!-- HISTORY TAB -->
+            <div id="historyContainer" style="display: none; margin-top: 20px;">
+                <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <h2 style="font-size: 18px; font-weight: bold; color: #333; margin-bottom: 20px;">📅 History</h2>
                     <table class="history-table">
                         <thead>
                             <tr>
-                                <th>Habit</th>
-                                <th>Streak</th>
-                                <th>Total Points</th>
-                                <th>Last Logged</th>
+                                <th>Domain</th>
+                                <th>Activity</th>
+                                <th>Date</th>
+                                <th>Minutes</th>
+                                <th>Points</th>
                             </tr>
                         </thead>
-                        <tbody id="historyTable">
-                        </tbody>
+                        <tbody id="historyTableBody"></tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- AUTH FORMS -->
+    <div id="authContainer" class="auth-container">
+        <h1 class="auth-title">Time Manager</h1>
+        <input type="email" id="authEmail" class="auth-input" placeholder="Email">
+        <input type="password" id="authPassword" class="auth-input" placeholder="Password">
+        <button class="auth-btn" id="authBtn">Sign Up</button>
+        <div class="auth-toggle">
+            <span id="toggleText">Already have an account? </span>
+            <button onclick="toggleAuthMode()">Sign In</button>
+        </div>
+        <button class="guest-btn" onclick="useGuestMode()">Continue as Guest</button>
+    </div>
+
     <!-- LOG MODAL -->
     <div class="modal" id="logModal">
         <div class="modal-content">
-            <h2>Log Habit</h2>
-            <p id="modalHabitName"></p>
-            <div class="time-presets">
-                <button class="time-btn" data-minutes="15" data-tooltip="15 minutes" onclick="selectTime(15)">15m</button>
-                <button class="time-btn" data-minutes="30" data-tooltip="30 minutes" onclick="selectTime(30)">30m</button>
-                <button class="time-btn" data-minutes="45" data-tooltip="45 minutes" onclick="selectTime(45)">45m</button>
-                <button class="time-btn" data-minutes="60" data-tooltip="1 hour" onclick="selectTime(60)">1h</button>
-                <button class="time-btn" data-minutes="90" data-tooltip="1.5 hours" onclick="selectTime(90)">1.5h</button>
-                <button class="time-btn" data-minutes="120" data-tooltip="2 hours" onclick="selectTime(120)">2h</button>
-                <button class="time-btn" data-minutes="150" data-tooltip="2.5 hours" onclick="selectTime(150)">2.5h</button>
-                <button class="time-btn" data-minutes="180" data-tooltip="3 hours" onclick="selectTime(180)">3h</button>
-            </div>
-            <input type="number" class="custom-input" id="customMinutes" placeholder="Or enter custom minutes" min="1" oninput="updatePointsPreview()">
-            <div class="points-preview" id="pointsPreview" style="color: #7B68EE; font-weight: bold; margin-bottom: 15px; text-align: center;"></div>
+            <h2 class="modal-title">Log Time</h2>
+            <input type="number" id="minutesInput" class="modal-input" placeholder="Minutes" min="1">
             <div class="modal-buttons">
-                <button class="btn-modal btn-cancel" onclick="closeModal()">Cancel</button>
-                <button class="btn-modal btn-submit" onclick="logHabit()">Log</button>
+                <button class="modal-btn primary" onclick="confirmLogActivity()">Log</button>
+                <button class="modal-btn secondary" onclick="closeLogModal()">Cancel</button>
             </div>
         </div>
     </div>
 
-    <!-- Supabase SDK -->
+    <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
+        // ===== CONFIGURATION =====
         const SUPABASE_URL = 'https://kpvifxpxatosmaumldry.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwdmlmeHB4YXRvc21hdW1sZHJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0NDcyODEsImV4cCI6MjEwNTAyMzI4MX0.LCrNpv1dR10KRO7WBh-nfhkdp-nO0cYaAUeiKXpjTWQ';
 
+        const DOMAINS = ['Habits', 'Study', 'Work', 'Chores'];
+        const DOMAIN_ICONS = {
+            'Habits': '🏃',
+            'Study': '📚',
+            'Work': '💼',
+            'Chores': '🧹'
+        };
+
+        // ===== GLOBAL STATE =====
         let sbClient = null;
         let currentUser = null;
-        let habits = [];
-        let isGuest = false;
-        let selectedHabitId = null;
-        let selectedMinutes = null;
+        let activities = [];
+        let logs = [];
+        let currentDomain = 'All'; // 'All' for overview, or specific domain
+        let isAuthMode = 'signup'; // 'signup' or 'signin'
+        let currentActivityIdToLog = null;
+        let isGuestMode = false;
 
+        // ===== INIT SUPABASE =====
         function initSupabase() {
             if (window.supabase && !sbClient) {
                 sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                console.log('Supabase initialized');
             }
-            return sbClient;
         }
 
-        function showError(msg) {
-            const el = document.getElementById('authError');
-            el.textContent = msg;
-            el.style.display = 'block';
-            setTimeout(() => { el.style.display = 'none'; }, 5000);
-        }
+        // ===== AUTH FUNCTIONS =====
+        async function signUp() {
+            const email = document.getElementById('authEmail').value.trim();
+            const password = document.getElementById('authPassword').value.trim();
 
-        function showToast(msg) {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.textContent = msg;
-            document.body.appendChild(toast);
-
-            setTimeout(() => {
-                toast.classList.add('out');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        async function login() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
             if (!email || !password) {
-                showError('Please fill in all fields');
+                showToast('Please fill in all fields');
                 return;
             }
+
             try {
-                const sb = initSupabase();
-                if (!sb) {
-                    showError('Supabase not available. Try guest mode.');
-                    return;
-                }
-                const { data, error } = await sb.auth.signInWithPassword({ email, password });
-                if (error) {
-                    showError(error.message);
-                    return;
-                }
+                const { data, error } = await sbClient.auth.signUp({
+                    email: email,
+                    password: password
+                });
+
+                if (error) throw error;
                 currentUser = data.user;
-                document.getElementById('loginEmail').value = '';
-                document.getElementById('loginPassword').value = '';
-                await loadHabits();
-                showApp();
-            } catch (err) {
-                showError('Login failed: ' + err.message);
+                showToast('Account created! Logging in...');
+                setTimeout(() => showApp(), 1500);
+            } catch (error) {
+                showToast('Sign up error: ' + error.message);
             }
         }
 
-        async function register() {
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            const confirm = document.getElementById('registerConfirm').value;
-            const name = document.getElementById('registerName').value;
-            if (!email || !password || !confirm || !name) {
-                showError('Please fill all fields');
+        async function signIn() {
+            const email = document.getElementById('authEmail').value.trim();
+            const password = document.getElementById('authPassword').value.trim();
+
+            if (!email || !password) {
+                showToast('Please fill in all fields');
                 return;
             }
-            if (password !== confirm) {
-                showError('Passwords do not match');
-                return;
-            }
+
             try {
-                const sb = initSupabase();
-                const { data, error } = await sb.auth.signUp({ email, password, options: { data: { display_name: name } } });
-                if (error) {
-                    showError(error.message);
-                    return;
-                }
+                const { data, error } = await sbClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) throw error;
                 currentUser = data.user;
-                document.getElementById('registerEmail').value = '';
-                document.getElementById('registerPassword').value = '';
-                document.getElementById('registerConfirm').value = '';
-                document.getElementById('registerName').value = '';
-                toggleRegister();
-                showApp();
-            } catch (err) {
-                showError('Registration failed: ' + err.message);
+                showToast('Logged in successfully!');
+                setTimeout(() => showApp(), 1500);
+            } catch (error) {
+                showToast('Sign in error: ' + error.message);
             }
         }
 
-        function guestMode() {
-            isGuest = true;
+        function toggleAuthMode() {
+            isAuthMode = isAuthMode === 'signup' ? 'signin' : 'signup';
+            const btn = document.getElementById('authBtn');
+            const toggle = document.getElementById('toggleText');
+
+            if (isAuthMode === 'signup') {
+                btn.textContent = 'Sign Up';
+                toggle.textContent = 'Already have an account? ';
+            } else {
+                btn.textContent = 'Sign In';
+                toggle.textContent = "Don't have an account? ";
+            }
+        }
+
+        function useGuestMode() {
+            isGuestMode = true;
             currentUser = { id: 'guest', email: 'guest@local' };
-            habits = JSON.parse(localStorage.getItem('habits_guest') || '[]');
             showApp();
         }
 
         async function logout() {
-            try {
-                if (!isGuest) {
-                    const sb = initSupabase();
-                    if (sb) await sb.auth.signOut();
+            if (!isGuestMode) {
+                await sbClient.auth.signOut();
+            }
+            isGuestMode = false;
+            currentUser = null;
+            activities = [];
+            logs = [];
+            currentDomain = 'All';
+
+            document.getElementById('header').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('authContainer').style.display = 'block';
+            document.getElementById('authEmail').value = '';
+            document.getElementById('authPassword').value = '';
+            showToast('Logged out');
+        }
+
+        // ===== APP DISPLAY =====
+        async function showApp() {
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('header').style.display = 'flex';
+            document.getElementById('mainContent').style.display = 'flex';
+
+            // Set user info
+            document.getElementById('userEmail').textContent = currentUser.email;
+            const initial = currentUser.email.charAt(0).toUpperCase();
+            document.getElementById('userAvatar').textContent = initial;
+
+            // Show reset button for admin
+            if (currentUser.email.toLowerCase() === 'itay.aharon19@gmail.com') {
+                document.getElementById('resetBtn').style.display = 'block';
+            }
+
+            // Load data
+            await loadActivities();
+            await loadLogs();
+
+            // Render UI
+            renderDomainSelector();
+            currentDomain = 'All';
+            updateUIForCurrentDomain();
+            updateStats();
+        }
+
+        // ===== DATA LOADING =====
+        async function loadActivities() {
+            if (isGuestMode) {
+                const stored = localStorage.getItem('activities_guest');
+                activities = stored ? JSON.parse(stored) : [];
+            } else {
+                try {
+                    const { data, error } = await sbClient
+                        .from('activities')
+                        .select('*')
+                        .eq('user_id', currentUser.id);
+
+                    if (error) throw error;
+                    activities = data || [];
+                } catch (error) {
+                    console.error('Error loading activities:', error);
+                    activities = [];
                 }
-                currentUser = null;
-                habits = [];
-                isGuest = false;
-                showAuth();
-            } catch (err) {
-                currentUser = null;
-                showAuth();
             }
         }
 
-        async function resetAllData() {
-            const confirmReset = confirm('Are you sure you want to delete ALL your data? This cannot be undone. Click OK to confirm.');
-            if (!confirmReset) return;
+        async function loadLogs() {
+            if (isGuestMode) {
+                const stored = localStorage.getItem('logs_guest');
+                logs = stored ? JSON.parse(stored) : [];
+            } else {
+                try {
+                    const { data, error } = await sbClient
+                        .from('logs')
+                        .select('*')
+                        .eq('user_id', currentUser.id);
 
-            const finalConfirm = confirm('This is your FINAL WARNING: All habits and history will be permanently deleted. Are you absolutely sure?');
-            if (!finalConfirm) return;
+                    if (error) throw error;
+                    logs = data || [];
+                } catch (error) {
+                    console.error('Error loading logs:', error);
+                    logs = [];
+                }
+            }
+        }
 
-            try {
-                if (isGuest) {
-                    // Clear guest data from localStorage
-                    localStorage.removeItem('habits_guest');
-                    habits = [];
-                    renderHabits();
-                    updateStats();
-                    showToast('✓ All data cleared! Ready for a fresh start.');
-                } else {
-                    // Delete all habits from database
-                    const sb = initSupabase();
-                    if (!sb || !currentUser) return;
+        // ===== DOMAIN SELECTOR =====
+        function renderDomainSelector() {
+            const container = document.getElementById('domainSelector');
+            container.innerHTML = '';
 
-                    const { error } = await sb.from('habits').delete().eq('user_id', currentUser.id);
-                    if (error) {
-                        showToast('Error: ' + error.message);
-                        return;
+            // Overview button
+            const overviewBtn = document.createElement('button');
+            overviewBtn.className = 'domain-btn active';
+            overviewBtn.textContent = '📊 Overview';
+            overviewBtn.dataset.domain = 'All';
+            overviewBtn.onclick = () => selectDomain('All');
+            container.appendChild(overviewBtn);
+
+            // Domain buttons
+            DOMAINS.forEach(domain => {
+                const btn = document.createElement('button');
+                btn.className = 'domain-btn';
+                btn.textContent = `${DOMAIN_ICONS[domain]} ${domain}`;
+                btn.dataset.domain = domain;
+                btn.onclick = () => selectDomain(domain);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectDomain(domain) {
+            currentDomain = domain;
+
+            // Update button states
+            document.querySelectorAll('.domain-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.domain === domain);
+            });
+
+            updateUIForCurrentDomain();
+        }
+
+        function updateUIForCurrentDomain() {
+            if (currentDomain === 'All') {
+                document.getElementById('overviewContainer').style.display = 'block';
+                document.getElementById('domainViewContainer').style.display = 'none';
+                document.getElementById('historyContainer').style.display = 'none';
+                renderOverviewDashboard();
+            } else {
+                document.getElementById('overviewContainer').style.display = 'none';
+                document.getElementById('domainViewContainer').style.display = 'block';
+                document.getElementById('historyContainer').style.display = 'block';
+
+                document.getElementById('domainTitle').textContent = `${DOMAIN_ICONS[currentDomain]} ${currentDomain} Activities`;
+                renderActivitiesForDomain(currentDomain);
+                renderHistoryTable(currentDomain);
+            }
+        }
+
+        // ===== OVERVIEW DASHBOARD =====
+        function renderOverviewDashboard() {
+            const today = new Date().toISOString().split('T')[0];
+            const container = document.getElementById('domainStatsContainer');
+            container.innerHTML = '';
+
+            DOMAINS.forEach(domain => {
+                const domainActivities = activities.filter(a => a.domain === domain);
+                const minutesToday = domainActivities.reduce((sum, activity) => {
+                    if (activity.lastLoggedDate === today) {
+                        return sum + activity.minutes_logged;
                     }
+                    return sum;
+                }, 0);
 
-                    habits = [];
-                    renderHabits();
-                    updateStats();
-                    showToast('✓ All data cleared! Ready for a fresh start.');
+                const card = document.createElement('div');
+                card.className = 'domain-stat-card';
+                card.onclick = () => selectDomain(domain);
+                card.innerHTML = `
+                    <div class="domain-icon">${DOMAIN_ICONS[domain]}</div>
+                    <div class="domain-name">${domain}</div>
+                    <div class="domain-minutes">${minutesToday} mins</div>
+                `;
+                container.appendChild(card);
+            });
+
+            // Total time today
+            const totalMinutesToday = activities.reduce((sum, activity) => {
+                if (activity.lastLoggedDate === today) {
+                    return sum + activity.minutes_logged;
                 }
-            } catch (err) {
-                alert('Error resetting data: ' + err.message);
-            }
+                return sum;
+            }, 0);
+            document.getElementById('totalTimeToday').textContent = `${totalMinutesToday} mins`;
         }
 
-        async function loadHabits() {
-            if (isGuest) {
-                habits = JSON.parse(localStorage.getItem('habits_guest') || '[]');
-                return;
-            }
-            try {
-                const sb = initSupabase();
-                if (!sb || !currentUser) return;
-                const { data, error } = await sb.from('habits').select('*').eq('user_id', currentUser.id);
-                if (error) throw error;
-                habits = (data || []).map(h => ({
-                    id: h.id,
-                    name: h.name,
-                    streak: h.streak || 0,
-                    lastLoggedDate: h.last_logged_date,
-                    totalPoints: h.total_points || 0,
-                    minutesLogged: h.minutes_logged || 0,
-                    isDeleted: h.is_deleted || false
-                }));
-            } catch (err) {
-                console.error('Load error:', err);
-            }
-        }
-
-        async function saveHabits() {
-            if (isGuest) {
-                localStorage.setItem('habits_guest', JSON.stringify(habits));
-                return;
-            }
-            try {
-                const sb = initSupabase();
-                if (!sb || !currentUser) return;
-                for (let h of habits) {
-                    const dbRecord = {
-                        name: h.name,
-                        streak: h.streak || 0,
-                        last_logged_date: h.lastLoggedDate,
-                        total_points: h.totalPoints || 0,
-                        minutes_logged: h.minutesLogged || 0,
-                        is_deleted: h.isDeleted || false
-                    };
-                    if (!h.id || h.id > Date.now() - 86400000) {
-                        const { data, error } = await sb.from('habits').insert([{
-                            user_id: currentUser.id,
-                            ...dbRecord
-                        }]).select();
-                        if (data && data[0]) h.id = data[0].id;
-                    } else {
-                        await sb.from('habits').update(dbRecord).eq('id', h.id).eq('user_id', currentUser.id);
-                    }
-                }
-            } catch (err) {
-                console.error('Save error:', err);
-            }
-        }
-
-        function addHabit() {
-            const input = document.getElementById('habitInput');
+        // ===== ACTIVITY MANAGEMENT =====
+        async function addActivityToCurrentDomain() {
+            const input = document.getElementById('activityInput');
             const name = input.value.trim();
+
             if (!name) {
-                showError('Please enter a habit name');
+                showToast('Please enter an activity name');
                 return;
             }
-            habits.push({
-                id: Date.now(),
+
+            const newActivity = {
+                user_id: currentUser.id,
+                domain: currentDomain,
                 name: name,
                 streak: 0,
                 lastLoggedDate: null,
+                minutes_logged: 0,
                 totalPoints: 0,
-                minutesLogged: 0,
-                isDeleted: false
-            });
-            input.value = '';
-            saveHabits();
-            renderHabits();
-            updateStats();
-        }
+                isPinned: false,
+                isCompleted: false,
+                completedAt: null
+            };
 
-        function checkAndResetStreaks() {
-            const today = new Date().toISOString().split('T')[0];
-            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+            if (isGuestMode) {
+                newActivity.id = 'guest_' + Date.now();
+                activities.push(newActivity);
+                localStorage.setItem('activities_guest', JSON.stringify(activities));
+            } else {
+                try {
+                    const { data, error } = await sbClient
+                        .from('activities')
+                        .insert([newActivity])
+                        .select();
 
-            habits.forEach(h => {
-                if (!h.isDeleted && h.lastLoggedDate) {
-                    // If last logged date is not today or yesterday, reset streak
-                    if (h.lastLoggedDate !== today && h.lastLoggedDate !== yesterday) {
-                        h.streak = 0;
-                    }
+                    if (error) throw error;
+                    activities.push(data[0]);
+                } catch (error) {
+                    showToast('Error adding activity: ' + error.message);
+                    return;
                 }
-            });
+            }
+
+            input.value = '';
+            showToast(`✅ ${name} added to ${currentDomain}!`);
+            renderActivitiesForDomain(currentDomain);
         }
 
-        function renderHabits() {
-            // Check and reset streaks before rendering
-            checkAndResetStreaks();
+        function renderActivitiesForDomain(domain) {
+            const container = document.getElementById('activitiesList');
+            const domainActivities = activities.filter(a => a.domain === domain);
 
-            const list = document.getElementById('habitsList');
-            const active = habits.filter(h => !h.isDeleted);
-
-            if (active.length === 0) {
-                list.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">No habits yet. Add one to get started!</p>';
+            if (domainActivities.length === 0) {
+                container.innerHTML = '<p style="color: #999; text-align: center; padding: 40px 20px;">No activities yet. Add one to get started!</p>';
                 return;
             }
 
-            list.innerHTML = active.map(h => `
-                <div class="habit-card">
-                    <div class="habit-info">
-                        <div class="habit-name">${h.name}</div>
-                        <div class="habit-stats">
-                            <div class="habit-stat">🔥 Streak: ${h.streak} days</div>
-                            <div class="habit-stat">⭐ Points: ${h.totalPoints}</div>
-                            <div class="habit-stat">⏱️ Time: ${h.minutesLogged} mins</div>
+            container.innerHTML = '';
+            domainActivities.forEach(activity => {
+                const card = document.createElement('div');
+                card.className = 'activity-card';
+                card.innerHTML = `
+                    <div class="activity-info">
+                        <div class="activity-name">${activity.name}</div>
+                        <div class="activity-stats">
+                            <span>🔥 ${activity.streak}-day streak</span>
+                            <span>⏱️ ${activity.minutes_logged} mins</span>
+                            <span>⭐ ${activity.totalPoints} points</span>
                         </div>
                     </div>
-                    <div class="habit-actions">
-                        <button class="habit-actions button btn-log" onclick="openLogModal('${h.id}')">Log Habit</button>
-                        <button class="habit-actions button btn-done" onclick="completeHabit('${h.id}')">Done</button>
-                        <button class="habit-actions button btn-delete" onclick="deleteHabit('${h.id}')">Delete</button>
+                    <div class="activity-actions">
+                        <button class="btn-log" onclick="openLogModal('${activity.id}')">Log Time</button>
+                        <button class="btn-delete" onclick="deleteActivity('${activity.id}')">Delete</button>
                     </div>
-                </div>
-            `).join('');
-
-            updateHistoryTable();
+                `;
+                container.appendChild(card);
+            });
         }
 
-        function updateHistoryTable() {
-            const tbody = document.getElementById('historyTable');
-            tbody.innerHTML = habits.filter(h => !h.isDeleted).map(h => `
-                <tr>
-                    <td>${h.name}</td>
-                    <td>${h.streak} days</td>
-                    <td>${h.totalPoints} points</td>
-                    <td>${h.lastLoggedDate || 'Never'}</td>
-                </tr>
-            `).join('');
-        }
-
-        function updateStats() {
-            const active = habits.filter(h => !h.isDeleted);
-            const totalPoints = active.reduce((sum, h) => sum + h.totalPoints, 0);
-            const maxPoints = 200;
-            const progress = Math.min((totalPoints / maxPoints) * 100, 100);
-
-            document.getElementById('progressFill').style.width = progress + '%';
-            document.getElementById('progressFill').textContent = Math.round(progress) + '%';
-            document.getElementById('totalPoints').textContent = totalPoints;
-            document.getElementById('activeHabits').textContent = active.length;
-            document.getElementById('thisMonth').textContent = active.filter(h => h.lastLoggedDate && new Date(h.lastLoggedDate).getMonth() === new Date().getMonth()).length;
-        }
-
-        function openLogModal(habitId) {
-            const h = habits.find(x => x.id == habitId);
-            if (!h) return;
-            selectedHabitId = habitId;
-            selectedMinutes = null;
-            document.getElementById('modalHabitName').textContent = 'Log: ' + h.name;
-            document.getElementById('customMinutes').value = '';
-            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('pointsPreview').textContent = 'Every 15 mins is 1 point';
+        // ===== LOGGING =====
+        function openLogModal(activityId) {
+            currentActivityIdToLog = activityId;
+            document.getElementById('minutesInput').value = '';
             document.getElementById('logModal').classList.add('active');
         }
 
-        function closeModal() {
+        function closeLogModal() {
             document.getElementById('logModal').classList.remove('active');
-            selectedHabitId = null;
-            selectedMinutes = null;
+            currentActivityIdToLog = null;
         }
 
-        function selectTime(minutes) {
-            selectedMinutes = minutes;
-            document.getElementById('customMinutes').value = minutes;
-            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            updatePointsPreview();
-        }
+        async function confirmLogActivity() {
+            const minutes = parseInt(document.getElementById('minutesInput').value);
 
-        function updatePointsPreview() {
-            let mins = selectedMinutes || parseInt(document.getElementById('customMinutes').value);
-            if (!mins || mins < 1) {
-                document.getElementById('pointsPreview').textContent = 'Every 15 mins is 1 point';
+            if (!minutes || minutes <= 0) {
+                showToast('Please enter valid minutes');
                 return;
             }
-            const points = Math.floor(mins / 15);
-            document.getElementById('pointsPreview').textContent = `For: ${mins} mins you will get: ${points} ${points === 1 ? 'point' : 'points'}`;
 
-            // Clear selected button if user is typing in custom field
-            const customInput = document.getElementById('customMinutes');
-            if (document.activeElement === customInput) {
-                selectedMinutes = null;
-                document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
-            }
-        }
+            const activity = activities.find(a => a.id === currentActivityIdToLog);
+            if (!activity) return;
 
-        function logHabit() {
-            let mins = selectedMinutes || parseInt(document.getElementById('customMinutes').value);
-            if (!mins || mins < 1) {
-                alert('Please select or enter minutes');
-                return;
-            }
-            const h = habits.find(x => x.id == selectedHabitId);
-            if (!h) return;
-
-            // Add minutes to total and recalculate points
-            if (!h.minutesLogged) h.minutesLogged = 0;
-            h.minutesLogged += mins;
-            h.totalPoints = Math.floor(h.minutesLogged / 15);
-
-            // Handle streak logic
             const today = new Date().toISOString().split('T')[0];
-            const lastLogged = h.lastLoggedDate;
 
-            if (!lastLogged) {
-                // First time logging this habit
-                h.streak = 1;
-            } else if (lastLogged === today) {
-                // Already logged today, don't change streak
-                // (streak stays the same)
+            // Update activity
+            activity.minutes_logged += minutes;
+            activity.totalPoints = Math.floor(activity.minutes_logged / 15);
+
+            // Update streak
+            if (!activity.lastLoggedDate) {
+                activity.streak = 1;
+            } else if (activity.lastLoggedDate === today) {
+                // Already logged today, streak stays same
             } else {
-                // Check if logged yesterday (consecutive day)
                 const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-                if (lastLogged === yesterday) {
-                    // Consecutive day - increment streak
-                    h.streak = (h.streak || 0) + 1;
+                if (activity.lastLoggedDate === yesterday) {
+                    activity.streak = (activity.streak || 0) + 1;
                 } else {
-                    // Skipped a day - reset streak
-                    h.streak = 1;
+                    activity.streak = 1;
                 }
             }
 
-            h.lastLoggedDate = today;
+            activity.lastLoggedDate = today;
 
-            saveHabits();
-            renderHabits();
-            updateStats();
-            closeModal();
-            showToast('Logged ' + mins + ' mins! Total: ' + h.minutesLogged + ' mins (' + h.totalPoints + ' points)');
-        }
-
-        function completeHabit(habitId) {
-            const h = habits.find(x => x.id == habitId);
-            if (h) {
-                h.isDeleted = true;
-                saveHabits();
-                renderHabits();
-                updateStats();
-                showToast(h.name + ' marked as done! ✓');
-            }
-        }
-
-        function deleteHabit(habitId) {
-            if (confirm('Delete this habit?')) {
-                const h = habits.find(x => x.id == habitId);
-                if (h) {
-                    h.isDeleted = true;
-                    saveHabits();
-                    renderHabits();
-                    updateStats();
-                }
-            }
-        }
-
-        function toggleRegister() {
-            document.getElementById('loginForm').style.display = document.getElementById('loginForm').style.display === 'none' ? 'block' : 'none';
-            document.getElementById('registerForm').style.display = document.getElementById('registerForm').style.display === 'none' ? 'block' : 'none';
-        }
-
-        function showAuth() {
-            document.getElementById('authScreen').style.display = 'block';
-            document.getElementById('appScreen').style.display = 'none';
-        }
-
-        function showApp() {
-            document.getElementById('authScreen').style.display = 'none';
-            document.getElementById('appScreen').style.display = 'block';
-            document.getElementById('userEmail').textContent = currentUser.email || 'Guest';
-            const initials = (currentUser.email || 'G')[0].toUpperCase();
-            document.getElementById('userProfile').textContent = initials;
-
-            // Show reset button only for specific email
-            const resetBtn = document.getElementById('resetBtn');
-            if (currentUser.email && currentUser.email.toLowerCase() === 'itay.aharon19@gmail.com') {
-                resetBtn.style.display = 'block';
+            // Save to DB
+            if (isGuestMode) {
+                localStorage.setItem('activities_guest', JSON.stringify(activities));
             } else {
-                resetBtn.style.display = 'none';
+                try {
+                    await sbClient
+                        .from('activities')
+                        .update({
+                            minutes_logged: activity.minutes_logged,
+                            totalPoints: activity.totalPoints,
+                            streak: activity.streak,
+                            lastLoggedDate: activity.lastLoggedDate
+                        })
+                        .eq('id', activity.id);
+                } catch (error) {
+                    showToast('Error updating activity: ' + error.message);
+                }
             }
 
-            renderHabits();
+            // Log entry
+            const logEntry = {
+                user_id: currentUser.id,
+                activity_id: activity.id,
+                date: today,
+                minutes_logged: minutes
+            };
+
+            if (isGuestMode) {
+                logEntry.id = 'guest_log_' + Date.now();
+                logs.push(logEntry);
+                localStorage.setItem('logs_guest', JSON.stringify(logs));
+            } else {
+                try {
+                    await sbClient
+                        .from('logs')
+                        .insert([logEntry]);
+                    logs.push(logEntry);
+                } catch (error) {
+                    showToast('Error logging entry: ' + error.message);
+                }
+            }
+
+            showToast(`✅ Logged ${minutes} minutes! Total: ${activity.minutes_logged} mins (${activity.totalPoints} points)`);
+            closeLogModal();
+            renderActivitiesForDomain(currentDomain);
+            updateStats();
+            updateUIForCurrentDomain();
+        }
+
+        async function deleteActivity(activityId) {
+            if (!confirm('Are you sure?')) return;
+
+            if (isGuestMode) {
+                activities = activities.filter(a => a.id !== activityId);
+                localStorage.setItem('activities_guest', JSON.stringify(activities));
+            } else {
+                try {
+                    await sbClient
+                        .from('activities')
+                        .delete()
+                        .eq('id', activityId);
+                    activities = activities.filter(a => a.id !== activityId);
+                } catch (error) {
+                    showToast('Error deleting activity: ' + error.message);
+                    return;
+                }
+            }
+
+            showToast('Activity deleted');
+            renderActivitiesForDomain(currentDomain);
             updateStats();
         }
 
-        document.addEventListener('DOMContentLoaded', async function() {
-            try {
-                const sb = initSupabase();
-                if (sb) {
-                    const { data: { user } } = await sb.auth.getUser();
-                    if (user) {
-                        currentUser = user;
-                        await loadHabits();
-                        showApp();
-                        return;
-                    }
-                }
-            } catch (err) {
-                console.error('Init error:', err);
+        // ===== HISTORY =====
+        function renderHistoryTable(domain) {
+            const tbody = document.getElementById('historyTableBody');
+            const domainActivities = activities.filter(a => a.domain === domain);
+            const domainLogs = logs.filter(log => {
+                const activity = activities.find(a => a.id === log.activity_id);
+                return activity && activity.domain === domain;
+            });
+
+            if (domainLogs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No history yet</td></tr>';
+                return;
             }
-            showAuth();
-        });
+
+            tbody.innerHTML = '';
+            domainLogs.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(log => {
+                const activity = activities.find(a => a.id === log.activity_id);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${DOMAIN_ICONS[domain]} ${domain}</td>
+                    <td>${activity.name}</td>
+                    <td>${new Date(log.date).toLocaleDateString()}</td>
+                    <td>${log.minutes_logged} mins</td>
+                    <td>${Math.floor(log.minutes_logged / 15)} pts</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // ===== STATS =====
+        function updateStats() {
+            const totalPoints = activities.reduce((sum, a) => sum + a.totalPoints, 0);
+            const activeDomains = new Set(activities.filter(a => a.streak > 0).map(a => a.domain)).size;
+            const totalMinutes = activities.reduce((sum, a) => sum + a.minutes_logged, 0);
+
+            document.getElementById('totalPoints').textContent = totalPoints;
+            document.getElementById('activeDomains').textContent = activeDomains;
+            document.getElementById('totalTime').textContent = totalMinutes + ' mins';
+
+            const progressPercent = Math.min((totalPoints / 10) * 100, 100);
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+            document.getElementById('progressFill').textContent = Math.round(progressPercent) + '%';
+        }
+
+        // ===== RESET DATA =====
+        async function resetAllData() {
+            if (!confirm('⚠️ This will delete ALL your data. Are you sure?')) return;
+            if (!confirm('⚠️⚠️ This cannot be undone. Type "confirm" to continue')) return;
+
+            if (isGuestMode) {
+                localStorage.removeItem('activities_guest');
+                localStorage.removeItem('logs_guest');
+            } else {
+                try {
+                    await sbClient
+                        .from('activities')
+                        .delete()
+                        .eq('user_id', currentUser.id);
+                } catch (error) {
+                    showToast('Error resetting data: ' + error.message);
+                    return;
+                }
+            }
+
+            activities = [];
+            logs = [];
+            showToast('✅ All data cleared!');
+            renderActivitiesForDomain(currentDomain);
+            updateStats();
+        }
+
+        // ===== TOAST =====
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('removing');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ===== INIT =====
+        async function init() {
+            initSupabase();
+
+            document.getElementById('authBtn').onclick = () => {
+                if (isAuthMode === 'signup') signUp();
+                else signIn();
+            };
+
+            document.getElementById('logoutBtn').onclick = logout;
+            document.getElementById('resetBtn').onclick = resetAllData;
+
+            // Check if user is logged in
+            if (sbClient) {
+                const { data: { user } } = await sbClient.auth.getUser();
+                if (user) {
+                    currentUser = user;
+                    showApp();
+                }
+            }
+        }
+
+        // Start the app
+        window.onload = init;
     </script>
 </body>
 </html>
